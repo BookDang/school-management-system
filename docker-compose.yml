@@ -1,0 +1,91 @@
+version: "3.9"
+
+services:
+  db:
+    image: mysql:8.4
+    container_name: sms_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-rootpassword}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-school_management}
+      MYSQL_USER: ${MYSQL_USER:-sms_user}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-sms_password}
+    ports:
+      - "${MYSQL_PORT:-3306}:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD:-rootpassword}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - sms_network
+
+  api:
+    build:
+      context: .
+      dockerfile: .docker/api/Dockerfile
+    container_name: sms_api
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      NODE_ENV: ${NODE_ENV:-development}
+      PORT: 4000
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_NAME: ${MYSQL_DATABASE:-school_management}
+      DB_USER: ${MYSQL_USER:-sms_user}
+      DB_PASSWORD: ${MYSQL_PASSWORD:-sms_password}
+    expose:
+      - "4000"
+    volumes:
+      - ./api:/app
+      - /app/node_modules
+    networks:
+      - sms_network
+
+  web:
+    build:
+      context: .
+      dockerfile: .docker/web/Dockerfile
+    container_name: sms_web
+    restart: unless-stopped
+    depends_on:
+      - api
+    environment:
+      NODE_ENV: ${NODE_ENV:-development}
+      PORT: 3000
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-/api}
+    expose:
+      - "3000"
+    volumes:
+      - ./web:/app
+      - /app/node_modules
+      - /app/.next
+    networks:
+      - sms_network
+
+  nginx:
+    image: nginx:1.31.5
+    container_name: sms_nginx
+    restart: unless-stopped
+    depends_on:
+      - web
+      - api
+    ports:
+      - "${HTTP_PORT:-80}:80"
+    volumes:
+      - ./.docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    networks:
+      - sms_network
+
+volumes:
+  db_data:
+
+networks:
+  sms_network:
+    driver: bridge
