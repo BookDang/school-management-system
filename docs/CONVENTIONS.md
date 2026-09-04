@@ -120,9 +120,9 @@ primary key is `id`; foreign keys are `<singular_table>_id` (`student_id`).
 
 If the work has a ticket/issue number, put it right after the type:
 `<type>/<TICKET-ID>-<kebab-case-slug>` — e.g. `feature/SMS-42-student-enrollment`. When a branch
-carries a ticket number, its commit subject lines reference the same ticket:
-`[SMS-42] Add student enrollment form`. No ticket number → no prefix, just the plain
-`<type>/<slug>` form and a plain commit subject.
+carries a ticket number, commit subjects use the ticket as the conventional-commit scope:
+`feat(42): add student enrollment form`. No ticket number → no scope, just
+`<type>: <description>` (e.g. `chore: upgrade nest`).
 
 ## Calling the API (web)
 
