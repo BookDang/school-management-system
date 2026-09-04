@@ -1,0 +1,16 @@
+.git
+.github
+
+**/node_modules
+**/dist
+**/.next
+**/.swc
+**/coverage
+**/playwright-report
+**/test-results
+**/blob-report
+
+docs
+*.md
+.vscode
+.idea
