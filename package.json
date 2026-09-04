@@ -1,0 +1,7 @@
+{
+  "name": "school-management-system",
+  "private": true,
+  "scripts": {
+    "check": "bash check.sh"
+  }
+}
