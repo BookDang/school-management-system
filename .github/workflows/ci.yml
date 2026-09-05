@@ -7,16 +7,61 @@ on:
     branches: [main, develop]
 
 jobs:
-  check:
-    name: check (${{ matrix.app }})
+  api:
+    name: check (api)
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        app: [api, web]
     defaults:
       run:
-        working-directory: ${{ matrix.app }}
+        working-directory: api
+    env:
+      CI: true
+      DB_HOST: 127.0.0.1
+      DB_PORT: 3306
+      DB_NAME: school_management
+      DB_USER: sms_user
+      DB_PASSWORD: sms_password
+      JWT_SECRET: ci-secret
+      JWT_EXPIRES_IN: 1d
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_DATABASE: school_management
+          MYSQL_USER: sms_user
+          MYSQL_PASSWORD: sms_password
+          MYSQL_ROOT_PASSWORD: rootpassword
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h localhost -u root -prootpassword"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: api/package-lock.json
+
+      - run: npm ci
+
+      - run: npm run lint
+
+      - run: npm run test:cov
+
+      - run: npm run test:e2e
+
+      - run: npm run build
+
+  web:
+    name: check (web)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
     env:
       CI: true
     steps:
@@ -26,7 +71,7 @@ jobs:
         with:
           node-version: 24
           cache: npm
-          cache-dependency-path: ${{ matrix.app }}/package-lock.json
+          cache-dependency-path: web/package-lock.json
 
       - run: npm ci
 
@@ -34,10 +79,9 @@ jobs:
 
       - run: npm run test:cov
 
+      - run: npm run build
+
       - name: Install Playwright browsers
-        if: matrix.app == 'web'
         run: npx playwright install --with-deps chromium
 
       - run: npm run test:e2e
-
-      - run: npm run build

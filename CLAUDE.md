@@ -14,8 +14,9 @@ Two apps, one repo: `web` (Next.js) and `api` (NestJS), backed by MySQL 8.4, fro
 - `docker.sh` — `./docker.sh up` registers the local fake domain `sms.site` in the hosts file and
   runs `docker compose up --build`; `./docker.sh down` stops it. Nginx routes `sms.site` → web,
   `sms.site/api` → api.
-- `check.sh` / `npm run check` — lint + unit test + build for both apps in one command. No CI
-  pipeline yet (no Jenkins/GitHub Actions) — this is the manual substitute for now.
+- `check.sh` / `npm run check` — lint + unit test + build for both apps in one command; also what
+  `.github/workflows/ci.yml` runs on push/PR to `main`/`develop` (api's e2e job needs a MySQL
+  service container — see the workflow file if editing it).
 - Full command reference: [docs/COMMANDS.md](docs/COMMANDS.md).
 
 ## Conventions
@@ -33,3 +34,10 @@ Two apps, one repo: `web` (Next.js) and `api` (NestJS), backed by MySQL 8.4, fro
 ## Branching
 
 `main` (default) ← `develop` ← feature branches (e.g. `feature/docker-setup`).
+
+## Git workflow
+
+Never `git commit` or `git push` without the user explicitly asking for it in that turn. Doing
+the work (editing files, installing packages) is not consent to also commit it — ask, or wait to
+be asked, even mid-task. This holds even if a previous turn in the same conversation asked for a
+commit; that authorization does not carry forward automatically.
