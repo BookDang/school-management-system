@@ -18,7 +18,10 @@ const LoginForm = ({ title, onSubmit, isSubmitting, errorMessage }: LoginFormPro
     control,
     handleSubmit,
     formState: { errors },
-  } = useForm<LoginInput>({ resolver: zodResolver(loginSchema) });
+  } = useForm<LoginInput>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: { email: '', password: '' },
+  });
 
   return (
     <div className="mx-auto flex w-full max-w-sm flex-col gap-6 px-6 py-16">
@@ -29,6 +32,7 @@ const LoginForm = ({ title, onSubmit, isSubmitting, errorMessage }: LoginFormPro
       <Form layout="vertical" onFinish={() => handleSubmit(onSubmit)()}>
         <Form.Item
           label="Email"
+          htmlFor="email"
           validateStatus={errors.email ? 'error' : ''}
           help={errors.email?.message}
         >
@@ -36,7 +40,13 @@ const LoginForm = ({ title, onSubmit, isSubmitting, errorMessage }: LoginFormPro
             name="email"
             control={control}
             render={({ field }) => (
-              <Input {...field} type="email" autoComplete="email" prefix={<MailOutlined />} />
+              <Input
+                {...field}
+                id="email"
+                type="email"
+                autoComplete="email"
+                prefix={<MailOutlined />}
+              />
             )}
           />
         </Form.Item>
@@ -50,6 +60,7 @@ const LoginForm = ({ title, onSubmit, isSubmitting, errorMessage }: LoginFormPro
               </span>
             </span>
           }
+          htmlFor="password"
           validateStatus={errors.password ? 'error' : ''}
           help={errors.password?.message}
         >
@@ -59,6 +70,7 @@ const LoginForm = ({ title, onSubmit, isSubmitting, errorMessage }: LoginFormPro
             render={({ field }) => (
               <Input.Password
                 {...field}
+                id="password"
                 autoComplete="current-password"
                 prefix={<LockOutlined />}
               />

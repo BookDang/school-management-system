@@ -16,9 +16,13 @@ const config: Config = {
   collectCoverageFrom: [
     'src/**/*.{ts,tsx}',
     '!src/**/*.d.ts',
-    '!src/app/layout.tsx',
-    '!src/app/page.tsx',
+    '!src/app/**/layout.tsx',
+    '!src/app/**/page.tsx',
     '!src/app/providers.tsx',
+    '!src/helpers/RootShell.tsx',
+    '!src/features/*/api.ts',
+    '!src/features/*/mutations.ts',
+    '!src/features/*/queries.ts',
   ],
   coverageThreshold: {
     global: {

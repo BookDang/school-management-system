@@ -61,6 +61,9 @@ Two apps, one repo: `web` (Next.js) and `api` (NestJS), backed by MySQL 8.4, fro
 - Naming: `camelCase` vars/functions, `PascalCase` classes/components/types, `kebab-case` folders
   and NestJS artifact files, `PascalCase.tsx` for React component files, `snake_case` DB
   tables/columns. Full table: [docs/CONVENTIONS.md](docs/CONVENTIONS.md).
+- Comments and descriptions inside code (docstrings, inline comments) are always in English,
+  regardless of what language the conversation driving the change is in. This is about code only —
+  conversation with the user stays in whatever language they're using.
 - Full conventions (folder-by-feature structure, lint rules): [docs/CONVENTIONS.md](docs/CONVENTIONS.md).
 - Testing rules (unit/e2e locations, naming, coverage thresholds): [docs/TESTING.md](docs/TESTING.md).
 
@@ -74,6 +77,10 @@ Never `git commit` or `git push` without the user explicitly asking for it in th
 the work (editing files, installing packages) is not consent to also commit it — ask, or wait to
 be asked, even mid-task. This holds even if a previous turn in the same conversation asked for a
 commit; that authorization does not carry forward automatically.
+
+When a `git merge`/`rebase`/`cherry-pick` produces a conflict, don't resolve it unilaterally — even
+when the "correct" resolution looks obvious. Stop, show the conflicting hunks and what each side
+was trying to do, propose a resolution, and get the user's go-ahead before staging/committing it.
 
 ## Change workflow
 
