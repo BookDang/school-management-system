@@ -5,7 +5,14 @@ Two apps, one repo: `web` (Next.js) and `api` (NestJS), backed by MySQL 8.4, fro
 ## Structure
 
 - `web/` — Next.js app. Routes live in `src/app/` (thin, App Router requires this location);
-  actual feature code lives in `src/features/<feature>/`. See [docs/CONVENTIONS.md](docs/CONVENTIONS.md).
+  actual feature code lives in `src/features/<feature>/`. There is **no shared `app/layout.tsx`**
+  — `app/(user)/layout.tsx` and `app/admin/layout.tsx` are each an independent root layout (own
+  `<html>`/`<body>`/metadata), Next.js's "multiple root layouts" pattern, because the end-user and
+  staff portals are meant to be fully separate experiences (navigating between them is a full page
+  reload, by design). Cross-cutting non-feature code mirrors the api side: `constants/`, `utils/`
+  (pure, framework-agnostic), `helpers/` (cross-cutting but React/Next-aware), `lib/` (external
+  service clients, e.g. `apiClient.ts` — the web equivalent of api's `infrastructure/`).
+  See [docs/CONVENTIONS.md](docs/CONVENTIONS.md).
 - `api/` — NestJS app. Feature code lives in `src/modules/<feature>/`, each with its own
   `<feature>.module.ts` imported into the root `AppModule`. See [docs/CONVENTIONS.md](docs/CONVENTIONS.md).
   Cross-cutting integrations (DB, and future ones like payment) live in `src/infrastructure/<name>/`
@@ -16,6 +23,18 @@ Two apps, one repo: `web` (Next.js) and `api` (NestJS), backed by MySQL 8.4, fro
   Authorization (RBAC) is centralized in `src/modules/authorization/` (CASL) — every role's
   permissions live in one factory, routes just declare what they need via `@CheckPolicies(...)`.
   See [docs/CONVENTIONS.md](docs/CONVENTIONS.md) for how to add a role or a permission.
+  Auth is split into two portals sharing one `AuthModule`/`AuthService`: `AuthController`
+  (`/auth/register`, `/auth/login`, `/auth/refresh`, `/auth/logout`) for end users (students), and
+  `StaffAuthController` (`/auth/staff/*`, same four routes plus admin-only `/auth/staff/register`)
+  for admins/teachers. Access tokens are short-lived (`JWT_EXPIRES_IN`, default 15m) and returned
+  in the JSON body; refresh tokens (`JWT_REFRESH_SECRET`/`JWT_REFRESH_EXPIRES_IN`, default 7d)
+  are **never** in the response body — they're set as an httpOnly cookie (`refresh_token` /
+  `staff_refresh_token`, path `/auth`) so client-side JS can't read them, and are rotated + hashed
+  with SHA-256 on every use (`hashRefreshToken` in `auth.service.ts`) — never bcrypt a raw JWT, it
+  truncates at 72 bytes and same-user tokens share a long common prefix.
+  Cross-cutting non-feature code lives in `constants/` (static values), `utils/` (pure, app-agnostic
+  functions), and `helpers/` (cross-cutting but app-aware functions, e.g. `refresh-cookie.helper.ts`)
+  — see [docs/CONVENTIONS.md](docs/CONVENTIONS.md) for the exact distinction.
 - `.docker/` — Dockerfiles (`web/Dockerfile`, `api/Dockerfile`) and `nginx/default.conf`.
   `docker-compose.yml` itself stays at repo root.
 - `docs/` — project docs (conventions, testing rules, commands). Markdown docs belong here, not at repo root.
