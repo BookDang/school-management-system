@@ -1,4 +1,4 @@
-import apiClient from './apiClient';
+import apiClient, { setAccessToken } from './apiClient';
 
 const getHandler = () =>
   apiClient.interceptors.response as unknown as {
@@ -7,6 +7,34 @@ const getHandler = () =>
       rejected: (e: unknown) => Promise<never>;
     }>;
   };
+
+const getRequestHandler = () =>
+  apiClient.interceptors.request as unknown as {
+    handlers: Array<{ fulfilled: (c: { headers: Record<string, string> }) => unknown }>;
+  };
+
+describe('apiClient request interceptor', () => {
+  afterEach(() => {
+    setAccessToken(null);
+  });
+
+  it('attaches the access token as a Bearer header once set', () => {
+    setAccessToken('the-token');
+    const { fulfilled } = getRequestHandler().handlers[0];
+
+    const config = fulfilled({ headers: {} }) as { headers: Record<string, string> };
+
+    expect(config.headers.Authorization).toBe('Bearer the-token');
+  });
+
+  it('does not add an Authorization header when no token is set', () => {
+    const { fulfilled } = getRequestHandler().handlers[0];
+
+    const config = fulfilled({ headers: {} }) as { headers: Record<string, string> };
+
+    expect(config.headers.Authorization).toBeUndefined();
+  });
+});
 
 describe('apiClient response interceptor', () => {
   it('passes a successful response through unchanged', () => {
