@@ -8,5 +8,8 @@
   },
   "moduleNameMapper": {
     "^@/(.*)$": "<rootDir>/../src/$1"
-  }
+  },
+  "globalSetup": "<rootDir>/testcontainers-global-setup.ts",
+  "globalTeardown": "<rootDir>/testcontainers-global-teardown.ts",
+  "setupFiles": ["<rootDir>/testcontainers-env-setup.ts"]
 }
