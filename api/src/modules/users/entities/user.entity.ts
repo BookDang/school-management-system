@@ -24,6 +24,9 @@ export class User {
   @Column({ type: 'enum', enum: Role, default: Role.Student })
   role: Role;
 
+  @Column({ type: 'varchar', nullable: true })
+  hashedRefreshToken: string | null;
+
   @CreateDateColumn()
   createdAt: Date;
 
