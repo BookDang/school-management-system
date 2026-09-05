@@ -15,30 +15,10 @@ jobs:
         working-directory: api
     env:
       CI: true
-      DB_HOST: 127.0.0.1
-      DB_PORT: 3306
-      DB_NAME: school_management
-      DB_USER: sms_user
-      DB_PASSWORD: sms_password
       JWT_SECRET: ci-secret
       JWT_EXPIRES_IN: 15m
       JWT_REFRESH_SECRET: ci-refresh-secret
       JWT_REFRESH_EXPIRES_IN: 7d
-    services:
-      mysql:
-        image: mysql:8.4
-        env:
-          MYSQL_DATABASE: school_management
-          MYSQL_USER: sms_user
-          MYSQL_PASSWORD: sms_password
-          MYSQL_ROOT_PASSWORD: rootpassword
-        ports:
-          - 3306:3306
-        options: >-
-          --health-cmd="mysqladmin ping -h localhost -u root -prootpassword"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=10
     steps:
       - uses: actions/checkout@v4
 

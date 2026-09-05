@@ -41,9 +41,15 @@ Two apps, one repo: `web` (Next.js) and `api` (NestJS), backed by MySQL 8.4, fro
 - `docker.sh` — `./docker.sh up` registers the local fake domain `sms.site` in the hosts file and
   runs `docker compose up --build`; `./docker.sh down` stops it. Nginx routes `sms.site` → web,
   `sms.site/api` → api.
-- `check.sh` / `npm run check` — lint + unit test + build for both apps in one command; also what
-  `.github/workflows/ci.yml` runs on push/PR to `main`/`develop` (api's e2e job needs a MySQL
-  service container — see the workflow file if editing it).
+- `check.sh` / `npm run check` — lint + coverage-checked unit tests (`test:cov`) + e2e + build for
+  both apps, mirroring what `.github/workflows/ci.yml` runs on push/PR to `main`/`develop` in one
+  local command. `npm run test` (plain, no coverage threshold) still exists per-app for a faster
+  inner-loop run.
+- `api`'s e2e tests never touch the `db` service you use for manual dev/`sms.site` — each run
+  spins up its own disposable MySQL via `testcontainers` (`api/test/testcontainers-*.ts`, wired in
+  as Jest's `globalSetup`/`globalTeardown`/`setupFiles`) and tears it down afterward, so `npm run
+  test:e2e`/`npm run check` can never write leftover rows into your real dev database. Docker must
+  be installed and runnable for this — same requirement as `docker compose`.
 - Full command reference: [docs/COMMANDS.md](docs/COMMANDS.md).
 
 ## Conventions
@@ -68,3 +74,18 @@ Never `git commit` or `git push` without the user explicitly asking for it in th
 the work (editing files, installing packages) is not consent to also commit it — ask, or wait to
 be asked, even mid-task. This holds even if a previous turn in the same conversation asked for a
 commit; that authorization does not carry forward automatically.
+
+## Change workflow
+
+Before making a code change (not just a doc tweak or a one-line fix the user already fully
+specified), write out the proposed solution in plain text first — what will change, why, and any
+trade-offs — and let the user review/confirm it before touching files. This matters most when
+there's more than one reasonable approach, or the change touches something shared/hard to reverse
+(CI, docker, auth, build scripts).
+
+## Testing workflow
+
+Don't run `npm run check` on your own initiative — it's slow and spins up a disposable Docker
+container (api's e2e tests via `testcontainers`). Run the narrower, fast command that actually
+verifies the change (`npm run lint`, `npm run test`, `npm run build`, one `test:e2e` file) and let
+the user ask for `npm run check` when they want the full CI-equivalent pass.

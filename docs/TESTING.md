@@ -8,7 +8,11 @@
 | E2E | `test/` | `*.e2e-spec.ts` | `npm run test:e2e` |
 
 - Unit tests mock all dependencies via `@nestjs/testing`'s `Test.createTestingModule` — no real DB/network calls.
-- E2E tests boot the full `AppModule` with Supertest and hit real HTTP routes; they may talk to the `db` service from `docker-compose.yml`.
+- E2E tests boot the full `AppModule` with Supertest and hit real HTTP routes, against a real
+  MySQL — but never the `db` service from `docker-compose.yml`. `testcontainers` provisions a
+  disposable MySQL container per run (`test/testcontainers-*.ts`, wired in via Jest's
+  `globalSetup`/`globalTeardown`/`setupFiles`) and tears it down after, so e2e runs can't leave
+  rows behind in the database you use for manual dev. Requires Docker to be installed/runnable.
 - Coverage threshold (`npm run test:cov`): 90% functions/lines/statements, 79% branches — enforced via `coverageThreshold` in `package.json`. Branches is capped lower on purpose: TypeScript's decorator compilation (`@Injectable()`, `@Controller()`, constructor parameter properties, `@Column()` etc.) emits `__decorate`/`__metadata` helper branches that are structurally always taken the same way given our `reflect-metadata` setup — no test can reach the other side, so 100% branches on decorator-heavy Nest files is not achievable. Don't chase phantom branch gaps on a file that's already 100% statements/functions/lines with no real conditional logic of its own.
 - Path alias `@/*` is available in both configs (`package.json` jest block and `test/jest-e2e.json`).
 
