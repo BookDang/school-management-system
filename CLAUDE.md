@@ -8,6 +8,11 @@ Two apps, one repo: `web` (Next.js) and `api` (NestJS), backed by MySQL 8.4, fro
   actual feature code lives in `src/features/<feature>/`. See [docs/CONVENTIONS.md](docs/CONVENTIONS.md).
 - `api/` — NestJS app. Feature code lives in `src/modules/<feature>/`, each with its own
   `<feature>.module.ts` imported into the root `AppModule`. See [docs/CONVENTIONS.md](docs/CONVENTIONS.md).
+  Cross-cutting integrations (DB, and future ones like payment) live in `src/infrastructure/<name>/`
+  — e.g. `src/infrastructure/database/data-source.ts` is the single source of TypeORM connection
+  config, shared by the app (`app.module.ts`) and the TypeORM CLI (`npm run migration:*`).
+  `synchronize` is always `false`; schema changes go through migrations in
+  `src/infrastructure/database/migrations/`, auto-run on boot (`migrationsRun: true`).
 - `.docker/` — Dockerfiles (`web/Dockerfile`, `api/Dockerfile`) and `nginx/default.conf`.
   `docker-compose.yml` itself stays at repo root.
 - `docs/` — project docs (conventions, testing rules, commands). Markdown docs belong here, not at repo root.
