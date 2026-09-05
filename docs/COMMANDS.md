@@ -23,6 +23,7 @@ Run from inside `web/` (`cd web`), or `npm --prefix web run <script>` from root.
 | `npm run lint` | Check formatting/lint rules with Biome. |
 | `npm run lint:fix` | Same, but auto-fixes what it can. |
 | `npm run format` | Format all files with Biome. |
+| `npm run typecheck` | Fast standalone type-check via `tsgo` (`@typescript/native-preview`, Microsoft's Go-ported compiler preview) — runs `next typegen` first so Next's generated route/layout types (`LayoutProps`, etc.) exist, since `tsgo` doesn't run Next's codegen itself. Supplementary to `npm run build`'s own type-check, not a replacement — `tsgo` is a preview build, web-only for now (not added to `api`, which leans on `emitDecoratorMetadata`/decorators that `tsgo` doesn't fully support yet). |
 | `npm run test` | Unit tests (Jest + React Testing Library). |
 | `npm run test:watch` | Unit tests in watch mode. |
 | `npm run test:cov` | Unit tests with coverage report. |
