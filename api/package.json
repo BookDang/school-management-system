@@ -81,7 +81,9 @@
     "collectCoverageFrom": [
       "**/*.(t|j)s",
       "!**/*.module.ts",
-      "!main.ts"
+      "!main.ts",
+      "!infrastructure/database/data-source.ts",
+      "!infrastructure/database/migrations/**"
     ],
     "coverageDirectory": "../coverage",
     "coverageThreshold": {
