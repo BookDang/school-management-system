@@ -9,6 +9,7 @@ type MockRepository = Partial<Record<keyof Repository<User>, jest.Mock>>;
 
 const createMockRepository = (): MockRepository => ({
   findOne: jest.fn(),
+  find: jest.fn(),
   create: jest.fn(),
   save: jest.fn(),
 });
@@ -69,6 +70,18 @@ describe('UsersService', () => {
       await service.findById('1');
 
       expect(repository.findOne).toHaveBeenCalledWith({ where: { id: '1' } });
+    });
+  });
+
+  describe('findAll', () => {
+    it('returns every user', async () => {
+      const users = [{ id: '1' }, { id: '2' }] as User[];
+      repository.find?.mockResolvedValue(users);
+
+      const result = await service.findAll();
+
+      expect(repository.find).toHaveBeenCalled();
+      expect(result).toBe(users);
     });
   });
 });

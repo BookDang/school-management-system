@@ -44,7 +44,7 @@ export class AuthService {
   }
 
   private buildAuthResult(user: User): AuthResult {
-    const accessToken = this.jwtService.sign({ sub: user.id, email: user.email });
+    const accessToken = this.jwtService.sign({ sub: user.id, email: user.email, role: user.role });
     return { accessToken, user: toPublicUser(user) };
   }
 }

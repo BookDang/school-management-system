@@ -1,5 +1,6 @@
 import { ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
+import { Role } from '@/modules/users/entities/role.enum';
 import { JwtStrategy } from './jwt.strategy';
 
 describe('JwtStrategy', () => {
@@ -17,8 +18,8 @@ describe('JwtStrategy', () => {
   });
 
   it('maps the JWT payload to an authenticated user', () => {
-    const result = strategy.validate({ sub: '1', email: 'jane@example.com' });
+    const result = strategy.validate({ sub: '1', email: 'jane@example.com', role: Role.Student });
 
-    expect(result).toEqual({ id: '1', email: 'jane@example.com' });
+    expect(result).toEqual({ id: '1', email: 'jane@example.com', role: Role.Student });
   });
 });

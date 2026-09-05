@@ -13,6 +13,9 @@ Two apps, one repo: `web` (Next.js) and `api` (NestJS), backed by MySQL 8.4, fro
   config, shared by the app (`app.module.ts`) and the TypeORM CLI (`npm run migration:*`).
   `synchronize` is always `false`; schema changes go through migrations in
   `src/infrastructure/database/migrations/`, auto-run on boot (`migrationsRun: true`).
+  Authorization (RBAC) is centralized in `src/modules/authorization/` (CASL) — every role's
+  permissions live in one factory, routes just declare what they need via `@CheckPolicies(...)`.
+  See [docs/CONVENTIONS.md](docs/CONVENTIONS.md) for how to add a role or a permission.
 - `.docker/` — Dockerfiles (`web/Dockerfile`, `api/Dockerfile`) and `nginx/default.conf`.
   `docker-compose.yml` itself stays at repo root.
 - `docs/` — project docs (conventions, testing rules, commands). Markdown docs belong here, not at repo root.
