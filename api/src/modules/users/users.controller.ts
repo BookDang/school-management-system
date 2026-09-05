@@ -1,6 +1,6 @@
 import { Controller, Get, NotFoundException, UseGuards } from '@nestjs/common';
-import { CurrentUser } from '@/common/decorators/current-user.decorator';
-import { JwtAuthGuard } from '@/common/guards/jwt-auth.guard';
+import { CurrentUser } from '@/modules/auth/decorators/current-user.decorator';
+import { JwtAuthGuard } from '@/modules/auth/guards/jwt-auth.guard';
 import type { AuthenticatedUser } from '@/modules/auth/strategies/jwt.strategy';
 import { toPublicUser } from './dto/public-user.dto';
 import { UsersService } from './users.service';
