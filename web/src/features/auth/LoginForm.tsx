@@ -1,7 +1,9 @@
 'use client';
 
+import { LockOutlined, MailOutlined } from '@ant-design/icons';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
+import { Button, Form, Input } from 'antd';
+import { Controller, useForm } from 'react-hook-form';
 import { type LoginInput, loginSchema, PASSWORD_HINT } from './schema';
 
 interface LoginFormProps {
@@ -13,7 +15,7 @@ interface LoginFormProps {
 
 const LoginForm = ({ title, onSubmit, isSubmitting, errorMessage }: LoginFormProps) => {
   const {
-    register,
+    control,
     handleSubmit,
     formState: { errors },
   } = useForm<LoginInput>({ resolver: zodResolver(loginSchema) });
@@ -21,48 +23,57 @@ const LoginForm = ({ title, onSubmit, isSubmitting, errorMessage }: LoginFormPro
   return (
     <div className="mx-auto flex w-full max-w-sm flex-col gap-6 px-6 py-16">
       <h1 className="text-xl font-semibold">{title}</h1>
-      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4" noValidate>
-        <div className="flex flex-col gap-1">
-          <label htmlFor="email" className="text-sm font-medium">
-            Email
-          </label>
-          <input
-            id="email"
-            type="email"
-            autoComplete="email"
-            className="rounded border border-black/[.15] px-3 py-2 dark:border-white/[.2]"
-            {...register('email')}
+      {/* antd's Form only drives the submit event here — validation stays on
+          react-hook-form + zod (see docs/CONVENTIONS.md) since Form.Item never
+          registers these fields with antd's own field store. */}
+      <Form layout="vertical" onFinish={() => handleSubmit(onSubmit)()}>
+        <Form.Item
+          label="Email"
+          validateStatus={errors.email ? 'error' : ''}
+          help={errors.email?.message}
+        >
+          <Controller
+            name="email"
+            control={control}
+            render={({ field }) => (
+              <Input {...field} type="email" autoComplete="email" prefix={<MailOutlined />} />
+            )}
           />
-          {errors.email && <p className="text-sm text-red-600">{errors.email.message}</p>}
-        </div>
+        </Form.Item>
 
-        <div className="flex flex-col gap-1">
-          <label htmlFor="password" className="text-sm font-medium">
-            Password
-            <span className="ml-1 text-xs font-normal text-black/50 dark:text-white/50">
-              ({PASSWORD_HINT})
+        <Form.Item
+          label={
+            <span>
+              Password{' '}
+              <span className="text-xs font-normal text-black/50 dark:text-white/50">
+                ({PASSWORD_HINT})
+              </span>
             </span>
-          </label>
-          <input
-            id="password"
-            type="password"
-            autoComplete="current-password"
-            className="rounded border border-black/[.15] px-3 py-2 dark:border-white/[.2]"
-            {...register('password')}
+          }
+          validateStatus={errors.password ? 'error' : ''}
+          help={errors.password?.message}
+        >
+          <Controller
+            name="password"
+            control={control}
+            render={({ field }) => (
+              <Input.Password
+                {...field}
+                autoComplete="current-password"
+                prefix={<LockOutlined />}
+              />
+            )}
           />
-          {errors.password && <p className="text-sm text-red-600">{errors.password.message}</p>}
-        </div>
+        </Form.Item>
 
         {errorMessage && <p className="text-sm text-red-600">{errorMessage}</p>}
 
-        <button
-          type="submit"
-          disabled={isSubmitting}
-          className="rounded-full bg-foreground px-5 py-2 text-sm font-medium text-background disabled:opacity-50"
-        >
-          {isSubmitting ? 'Signing in…' : 'Sign in'}
-        </button>
-      </form>
+        <Form.Item className="mb-0">
+          <Button type="primary" htmlType="submit" loading={isSubmitting} block>
+            Sign in
+          </Button>
+        </Form.Item>
+      </Form>
     </div>
   );
 };

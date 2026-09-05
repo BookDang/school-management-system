@@ -1,3 +1,4 @@
+import { AntdRegistry } from '@ant-design/nextjs-registry';
 import { Geist, Geist_Mono } from 'next/font/google';
 import '@/app/globals.css';
 import Providers from '@/app/providers';
@@ -35,17 +36,19 @@ export const RootShell = ({
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col">
-        <Providers>
-          <div className="flex min-h-full flex-1 flex-col">
-            <header className={`flex items-center justify-between px-6 py-4 ${headerClassName}`}>
-              <span className="font-semibold">{brand}</span>
-              <nav className={`flex gap-4 text-sm ${navClassName}`}>
-                <a href={navHref}>Dashboard</a>
-              </nav>
-            </header>
-            <main className="flex-1">{children}</main>
-          </div>
-        </Providers>
+        <AntdRegistry>
+          <Providers>
+            <div className="flex min-h-full flex-1 flex-col">
+              <header className={`flex items-center justify-between px-6 py-4 ${headerClassName}`}>
+                <span className="font-semibold">{brand}</span>
+                <nav className={`flex gap-4 text-sm ${navClassName}`}>
+                  <a href={navHref}>Dashboard</a>
+                </nav>
+              </header>
+              <main className="flex-1">{children}</main>
+            </div>
+          </Providers>
+        </AntdRegistry>
       </body>
     </html>
   );

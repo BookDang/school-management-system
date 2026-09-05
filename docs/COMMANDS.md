@@ -10,6 +10,35 @@
 | `npm run check` | Runs lint + unit test + build for both `api` and `web` (see `check.sh`). |
 | `docker compose up --build` | Same as `./docker.sh up` minus the hosts-file step. |
 | `docker compose down` | Same as `./docker.sh down` minus the hosts-file check. |
+| `docker compose down -v` | Same, and also deletes the `db_data` volume — wipes the MySQL database. |
+| `docker compose ps` | List the stack's containers and their status. |
+| `docker compose logs -f <service>` | Follow logs for one service (`web`, `api`, `db`, or `nginx`). |
+| `docker compose restart <service>` | Restart one service without rebuilding (e.g. after an env var change). |
+| `docker compose exec <service> sh` | Shell into a running container. |
+| `docker compose up -d --build --renew-anon-volumes <service>` | Rebuild one service and force-refresh its anonymous `node_modules` volume — see "Adding an npm dependency" below for when this is needed. |
+
+## Adding an npm dependency (`web/` or `api/`)
+
+Both apps' Dockerfiles (`.docker/web/Dockerfile`, `.docker/api/Dockerfile`) do `COPY package*.json ./`
+then `RUN npm install` at image-build time, and `docker-compose.yml` mounts each app's `node_modules`
+as an **anonymous volume** (`/app/node_modules`) so the container's installed packages don't get
+clobbered by the `./web:/app` / `./api:/app` bind mount of your source tree.
+
+That anonymous volume is the gotcha: Compose reuses it across `docker compose up --build` by
+default, so a plain rebuild after adding a package still runs the **old** container's `node_modules`
+— the new dependency 404s with "Module not found" even though the image was rebuilt correctly.
+
+1. Install on the host as usual (updates `package.json`/`package-lock.json`, which the bind mount
+   needs anyway for the source tree to be in sync):
+   ```bash
+   cd web && npm install <package>   # or: cd api && npm install <package>
+   ```
+2. Rebuild **and force-renew the anonymous volume** for that service:
+   ```bash
+   docker compose up -d --build --renew-anon-volumes web   # or: api
+   ```
+   Skipping `--renew-anon-volumes` (or its short form `-V`) is what leaves the stale `node_modules`
+   in place.
 
 ## `web/` (Next.js)
 
