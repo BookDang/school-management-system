@@ -167,3 +167,47 @@ src/features/students/
   (`type CreateStudentInput = z.infer<typeof createStudentSchema>`), wired through
   `react-hook-form` via `@hookform/resolvers/zod` (install it when the first form is built — not a
   base dependency).
+
+## Authorization (api, RBAC via CASL)
+
+All authorization rules live in one place: `api/src/modules/authorization/`. Nothing else
+hardcodes role checks — controllers only declare *which* permission a route needs, never *who* has
+it.
+
+- `actions.enum.ts` — the verbs: `Manage` (wildcard), `Create`, `Read`, `Update`, `Delete`.
+- `casl-ability.factory.ts` — the only file that maps a `Role` to what it can do. `CaslAbilityFactory.createForUser()` builds a CASL `Ability` from the JWT-decoded user's `role`.
+- `policies.guard.ts` / `check-policies.decorator.ts` — the enforcement mechanism: `PoliciesGuard` reads the handlers a route declared via `@CheckPolicies(...)` and runs them against the built ability.
+
+### Gate an endpoint (assign a permission to one feature/route)
+
+```ts
+@Get()
+@UseGuards(JwtAuthGuard, PoliciesGuard)          // JwtAuthGuard first — it sets request.user
+@CheckPolicies((ability) => ability.can(Action.Manage, 'all'))
+findAll() { ... }
+```
+
+`@CheckPolicies` takes one or more `(ability: AppAbility) => boolean` callbacks; every route decides
+its own requirement independently — there's no central route→permission table to keep in sync.
+
+### Add a new role
+
+1. Add it to `api/src/modules/users/entities/role.enum.ts` (e.g. `Parent = 'parent'`).
+2. Generate + apply the migration so the MySQL `enum` column accepts the new value:
+   `docker compose exec api npm run migration:generate -- src/infrastructure/database/migrations/Add<Role>Role`,
+   then `migration:run` (see [COMMANDS.md](COMMANDS.md)).
+3. Add a branch for it in `CaslAbilityFactory.createForUser()` — this is the *only* place that says
+   what the new role can do.
+
+### Add a new permission (new subject, e.g. a future `ClassRoom` entity)
+
+1. Add the entity to the `Subjects` union in `casl-ability.factory.ts`:
+   `type Subjects = InferSubjects<typeof User | typeof ClassRoom> | 'all';`
+2. Add rules per role in `createForUser()`, e.g. `can(Action.Update, ClassRoom, { teacherId: user.id })`
+   for instance-scoped access (only the teacher who owns that class).
+3. When checking an *instance* (not just the type) so field conditions like `{ teacherId: ... }`
+   actually evaluate, wrap it with CASL's `subject()` helper:
+   `ability.can(Action.Update, subject('ClassRoom', theClassRoomInstance))`. Checking against the
+   bare class/type (`ability.can(Action.Update, ClassRoom)`) skips condition evaluation — it only
+   answers "is there any rule for this action+type at all," so use it for list/menu-visibility
+   checks, not to gate access to one specific record.

@@ -2,6 +2,7 @@ import { UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Test, TestingModule } from '@nestjs/testing';
 import * as bcrypt from 'bcryptjs';
+import { Role } from '@/modules/users/entities/role.enum';
 import { UsersService } from '@/modules/users/users.service';
 import { AuthService } from './auth.service';
 
@@ -27,7 +28,9 @@ describe('AuthService', () => {
 
   describe('register', () => {
     it('hashes the password, creates the user and returns a token', async () => {
-      usersService.create.mockImplementation((input) => Promise.resolve({ id: '1', ...input }));
+      usersService.create.mockImplementation((input) =>
+        Promise.resolve({ id: '1', role: Role.Student, ...input }),
+      );
 
       const result = await service.register({
         email: 'jane@example.com',
@@ -39,10 +42,14 @@ describe('AuthService', () => {
       expect(createInput.password).not.toBe('password123');
       expect(await bcrypt.compare('password123', createInput.password)).toBe(true);
 
-      expect(jwtService.sign).toHaveBeenCalledWith({ sub: '1', email: 'jane@example.com' });
+      expect(jwtService.sign).toHaveBeenCalledWith({
+        sub: '1',
+        email: 'jane@example.com',
+        role: Role.Student,
+      });
       expect(result).toEqual({
         accessToken: 'signed-token',
-        user: { id: '1', email: 'jane@example.com', fullName: 'Jane Doe' },
+        user: { id: '1', email: 'jane@example.com', fullName: 'Jane Doe', role: Role.Student },
       });
     });
   });
@@ -55,13 +62,19 @@ describe('AuthService', () => {
         email: 'jane@example.com',
         password: hashedPassword,
         fullName: 'Jane Doe',
+        role: Role.Admin,
       });
 
       const result = await service.login({ email: 'jane@example.com', password: 'password123' });
 
+      expect(jwtService.sign).toHaveBeenCalledWith({
+        sub: '1',
+        email: 'jane@example.com',
+        role: Role.Admin,
+      });
       expect(result).toEqual({
         accessToken: 'signed-token',
-        user: { id: '1', email: 'jane@example.com', fullName: 'Jane Doe' },
+        user: { id: '1', email: 'jane@example.com', fullName: 'Jane Doe', role: Role.Admin },
       });
     });
 
@@ -80,6 +93,7 @@ describe('AuthService', () => {
         email: 'jane@example.com',
         password: hashedPassword,
         fullName: 'Jane Doe',
+        role: Role.Student,
       });
 
       await expect(

@@ -2,6 +2,7 @@ import { type INestApplication, ValidationPipe } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import request from 'supertest';
 import type { App } from 'supertest/types';
+import { Role } from '@/modules/users/entities/role.enum';
 import { AppModule } from './../src/app.module';
 
 describe('Auth (e2e)', () => {
@@ -31,7 +32,12 @@ describe('Auth (e2e)', () => {
       .expect(201);
 
     expect(res.body.accessToken).toEqual(expect.any(String));
-    expect(res.body.user).toEqual({ id: expect.any(String), email, fullName });
+    expect(res.body.user).toEqual({
+      id: expect.any(String),
+      email,
+      fullName,
+      role: Role.Student,
+    });
     expect(res.body.user.password).toBeUndefined();
   });
 
@@ -70,7 +76,7 @@ describe('Auth (e2e)', () => {
       .set('Authorization', `Bearer ${loginRes.body.accessToken}`)
       .expect(200);
 
-    expect(res.body).toEqual({ id: expect.any(String), email, fullName });
+    expect(res.body).toEqual({ id: expect.any(String), email, fullName, role: Role.Student });
   });
 
   it('rejects /users/me without a token', async () => {
