@@ -1,0 +1,43 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  check:
+    name: check (${{ matrix.app }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        app: [api, web]
+    defaults:
+      run:
+        working-directory: ${{ matrix.app }}
+    env:
+      CI: true
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: ${{ matrix.app }}/package-lock.json
+
+      - run: npm ci
+
+      - run: npm run lint
+
+      - run: npm run test:cov
+
+      - name: Install Playwright browsers
+        if: matrix.app == 'web'
+        run: npx playwright install --with-deps chromium
+
+      - run: npm run test:e2e
+
+      - run: npm run build
