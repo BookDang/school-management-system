@@ -39,4 +39,8 @@ export class UsersService {
   findAll(): Promise<User[]> {
     return this.usersRepository.find();
   }
+
+  async setRefreshToken(id: string, hashedRefreshToken: string | null): Promise<void> {
+    await this.usersRepository.update({ id }, { hashedRefreshToken });
+  }
 }

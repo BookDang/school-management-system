@@ -7,9 +7,38 @@
 | `./docker.sh up` | Registers `sms.site` in the hosts file (once, idempotent), then `docker compose up --build` (web + api + db + nginx). Access at `http://sms.site`. |
 | `./docker.sh down` | Stops the containers (`docker compose down`). Leaves the `sms.site` hosts entry in place (harmless once containers are stopped). |
 | `PURGE_HOSTS=1 ./docker.sh down` | Same as `./docker.sh down`, and also removes the `sms.site` line from the hosts file. |
-| `npm run check` | Runs lint + unit test + build for both `api` and `web` (see `check.sh`). |
+| `npm run check` | Runs lint + `test:cov` (coverage-enforced) + e2e + build for both `api` and `web` — the same checks CI runs, in one command (see `check.sh`). Requires Docker: api's e2e tests provision their own disposable MySQL via `testcontainers` (never touching the `db` service you use for manual dev). |
 | `docker compose up --build` | Same as `./docker.sh up` minus the hosts-file step. |
 | `docker compose down` | Same as `./docker.sh down` minus the hosts-file check. |
+| `docker compose down -v` | Same, and also deletes the `db_data` volume — wipes the MySQL database. |
+| `docker compose ps` | List the stack's containers and their status. |
+| `docker compose logs -f <service>` | Follow logs for one service (`web`, `api`, `db`, or `nginx`). |
+| `docker compose restart <service>` | Restart one service without rebuilding (e.g. after an env var change). |
+| `docker compose exec <service> sh` | Shell into a running container. |
+| `docker compose up -d --build --renew-anon-volumes <service>` | Rebuild one service and force-refresh its anonymous `node_modules` volume — see "Adding an npm dependency" below for when this is needed. |
+
+## Adding an npm dependency (`web/` or `api/`)
+
+Both apps' Dockerfiles (`.docker/web/Dockerfile`, `.docker/api/Dockerfile`) do `COPY package*.json ./`
+then `RUN npm install` at image-build time, and `docker-compose.yml` mounts each app's `node_modules`
+as an **anonymous volume** (`/app/node_modules`) so the container's installed packages don't get
+clobbered by the `./web:/app` / `./api:/app` bind mount of your source tree.
+
+That anonymous volume is the gotcha: Compose reuses it across `docker compose up --build` by
+default, so a plain rebuild after adding a package still runs the **old** container's `node_modules`
+— the new dependency 404s with "Module not found" even though the image was rebuilt correctly.
+
+1. Install on the host as usual (updates `package.json`/`package-lock.json`, which the bind mount
+   needs anyway for the source tree to be in sync):
+   ```bash
+   cd web && npm install <package>   # or: cd api && npm install <package>
+   ```
+2. Rebuild **and force-renew the anonymous volume** for that service:
+   ```bash
+   docker compose up -d --build --renew-anon-volumes web   # or: api
+   ```
+   Skipping `--renew-anon-volumes` (or its short form `-V`) is what leaves the stale `node_modules`
+   in place.
 
 ## `web/` (Next.js)
 
@@ -23,6 +52,7 @@ Run from inside `web/` (`cd web`), or `npm --prefix web run <script>` from root.
 | `npm run lint` | Check formatting/lint rules with Biome. |
 | `npm run lint:fix` | Same, but auto-fixes what it can. |
 | `npm run format` | Format all files with Biome. |
+| `npm run typecheck` | Fast standalone type-check via `tsgo` (`@typescript/native-preview`, Microsoft's Go-ported compiler preview) — runs `next typegen` first so Next's generated route/layout types (`LayoutProps`, etc.) exist, since `tsgo` doesn't run Next's codegen itself. Supplementary to `npm run build`'s own type-check, not a replacement — `tsgo` is a preview build, web-only for now (not added to `api`, which leans on `emitDecoratorMetadata`/decorators that `tsgo` doesn't fully support yet). |
 | `npm run test` | Unit tests (Jest + React Testing Library). |
 | `npm run test:watch` | Unit tests in watch mode. |
 | `npm run test:cov` | Unit tests with coverage report. |
@@ -47,7 +77,7 @@ Run from inside `api/` (`cd api`), or `npm --prefix api run <script>` from root.
 | `npm run test` | Unit tests (`*.spec.ts` in `src/`). |
 | `npm run test:watch` | Unit tests in watch mode. |
 | `npm run test:cov` | Unit tests with coverage report. |
-| `npm run test:e2e` | E2E tests (`*.e2e-spec.ts` in `test/`, Supertest against an in-process app). |
+| `npm run test:e2e` | E2E tests (`*.e2e-spec.ts` in `test/`, Supertest against an in-process app). Provisions its own disposable MySQL via `testcontainers` (Docker required) instead of using the `db` service — see `test/testcontainers-*.ts`. Runs `--runInBand` since all spec files share that one container. |
 | `npm run migration:generate -- src/infrastructure/database/migrations/<Name>` | Diff entities against the DB and generate a migration file. Needs a real MySQL running (`docker compose up -d db`) and `api/.env` pointed at it. |
 | `npm run migration:run` | Apply pending migrations (also happens automatically on app boot via `migrationsRun: true`). |
 | `npm run migration:revert` | Roll back the last applied migration. |
