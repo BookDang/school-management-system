@@ -84,11 +84,13 @@ was trying to do, propose a resolution, and get the user's go-ahead before stagi
 
 ## Change workflow
 
-Before making a code change (not just a doc tweak or a one-line fix the user already fully
-specified), write out the proposed solution in plain text first — what will change, why, and any
-trade-offs — and let the user review/confirm it before touching files. This matters most when
-there's more than one reasonable approach, or the change touches something shared/hard to reverse
-(CI, docker, auth, build scripts).
+Before touching any file — including a fix that looks small/obvious, like correcting a wrong
+config value — state the root cause and the proposed solution in plain text first, as two
+distinct things: what's actually broken and why, then what you'll change to fix it and any
+trade-offs. Let the user read that before editing. Only skip this for a pure doc tweak or a change
+the user already fully specified themselves. This matters most when there's more than one
+reasonable approach, or the change touches something shared/hard to reverse (CI, docker, auth,
+build scripts).
 
 ## Testing workflow
 
