@@ -2,6 +2,11 @@
 
 ## Root
 
+Run `npm install` at the repo root once after cloning — this is a separate npm project from
+`web/`/`api/` and its only job is running `husky` (via its `prepare` script) to wire up
+`.husky/pre-push`, which runs `npm run check` before every `git push` and blocks the push if it
+fails. Skipping this install just means pushes go out unchecked locally (CI still runs separately).
+
 | Command | What it does |
 |---|---|
 | `./docker.sh up` | Registers `sms.site` in the hosts file (once, idempotent), then `docker compose up --build` (web + api + db + nginx). Access at `http://sms.site`. |

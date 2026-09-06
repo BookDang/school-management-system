@@ -50,6 +50,8 @@ Two apps, one repo: `web` (Next.js) and `api` (NestJS), backed by MySQL 8.4, fro
   as Jest's `globalSetup`/`globalTeardown`/`setupFiles`) and tears it down afterward, so `npm run
   test:e2e`/`npm run check` can never write leftover rows into your real dev database. Docker must
   be installed and runnable for this — same requirement as `docker compose`.
+- Root `package.json` exists only to run Husky: `npm install` at the repo root wires up
+  `.husky/pre-push` to run `npm run check` before every `git push`, blocking the push on failure.
 - Full command reference: [docs/COMMANDS.md](docs/COMMANDS.md).
 
 ## Conventions

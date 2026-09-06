@@ -2,6 +2,10 @@
   "name": "school-management-system",
   "private": true,
   "scripts": {
-    "check": "bash check.sh"
+    "check": "bash check.sh",
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "husky": "^9.1.7"
   }
 }
