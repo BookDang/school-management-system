@@ -2,6 +2,12 @@
 
 ## Root
 
+Run `npm install` at the repo root after cloning (or after pulling changes to either app's
+`package.json`) — its `postinstall` script cascades into `npm install` for both `web/` and `api/`,
+so one command keeps all three in sync instead of installing each separately. It also runs
+Husky's `prepare` step, wiring up `.husky/pre-push` to run `npm run check` before every
+`git push` and block the push if it fails.
+
 | Command | What it does |
 |---|---|
 | `./docker.sh up` | Registers `sms.site` in the hosts file (once, idempotent), then `docker compose up --build` (web + api + db + nginx). Access at `http://sms.site`. |

@@ -4,8 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { dataSourceOptions } from './infrastructure/database/data-source';
 import { AppController } from './modules/app/app.controller';
 import { AppService } from './modules/app/app.service';
-import { AuthModule } from './modules/auth/auth.module';
-import { UsersModule } from './modules/users/users.module';
+import { FeaturesModule } from './modules/features.module';
 
 const { entities: _entities, ...runtimeDataSourceOptions } = dataSourceOptions;
 
@@ -19,8 +18,7 @@ const { entities: _entities, ...runtimeDataSourceOptions } = dataSourceOptions;
         migrationsRun: true,
       }),
     }),
-    UsersModule,
-    AuthModule,
+    FeaturesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

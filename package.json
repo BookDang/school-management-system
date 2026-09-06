@@ -2,6 +2,11 @@
   "name": "school-management-system",
   "private": true,
   "scripts": {
-    "check": "bash check.sh"
+    "check": "bash check.sh",
+    "postinstall": "npm --prefix web install && npm --prefix api install",
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "husky": "^9.1.7"
   }
 }
