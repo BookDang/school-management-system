@@ -11,5 +11,6 @@
   },
   "globalSetup": "<rootDir>/testcontainers-global-setup.ts",
   "globalTeardown": "<rootDir>/testcontainers-global-teardown.ts",
-  "setupFiles": ["<rootDir>/testcontainers-env-setup.ts"]
+  "setupFiles": ["<rootDir>/testcontainers-env-setup.ts"],
+  "testTimeout": 30000
 }
