@@ -1,0 +1,13 @@
+{
+  "RootShell": {
+    "brand": "School Portal",
+    "dashboardNav": "Dashboard"
+  },
+  "LoginPage": {
+    "title": "Sign in to School Portal",
+    "genericError": "Something went wrong"
+  },
+  "Dashboard": {
+    "title": "Dashboard"
+  }
+}

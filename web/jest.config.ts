@@ -23,6 +23,10 @@ const config: Config = {
     '!src/features/*/api.ts',
     '!src/features/*/mutations.ts',
     '!src/features/*/queries.ts',
+    '!src/proxy.ts',
+    '!src/i18n/routing.ts',
+    '!src/i18n/navigation.ts',
+    '!src/i18n/request.ts',
   ],
   coverageThreshold: {
     global: {

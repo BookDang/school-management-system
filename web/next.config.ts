@@ -1,4 +1,7 @@
 import type { NextConfig } from 'next';
+import createNextIntlPlugin from 'next-intl/plugin';
+
+const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts');
 
 const nextConfig: NextConfig = {
   // Without this, Next's dev server treats requests arriving with a Host header other than
@@ -8,4 +11,4 @@ const nextConfig: NextConfig = {
   allowedDevOrigins: ['sms.site'],
 };
 
-export default nextConfig;
+export default withNextIntl(nextConfig);

@@ -1,10 +1,11 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { renderWithIntl } from '../../test-utils/renderWithIntl';
 import LoginForm from './LoginForm';
 
 describe('LoginForm', () => {
   it('renders the title and fields', () => {
-    render(
+    renderWithIntl(
       <LoginForm title="Sign in to School Portal" onSubmit={jest.fn()} isSubmitting={false} />,
     );
 
@@ -15,7 +16,7 @@ describe('LoginForm', () => {
 
   it('shows the password hint in a tooltip on hover', async () => {
     const user = userEvent.setup();
-    render(<LoginForm title="Sign in" onSubmit={jest.fn()} isSubmitting={false} />);
+    renderWithIntl(<LoginForm title="Sign in" onSubmit={jest.fn()} isSubmitting={false} />);
 
     expect(screen.queryByText(/8-20 characters/i)).not.toBeInTheDocument();
 
@@ -27,7 +28,7 @@ describe('LoginForm', () => {
   it('shows validation errors and does not submit when the fields are invalid', async () => {
     const onSubmit = jest.fn();
     const user = userEvent.setup();
-    render(<LoginForm title="Sign in" onSubmit={onSubmit} isSubmitting={false} />);
+    renderWithIntl(<LoginForm title="Sign in" onSubmit={onSubmit} isSubmitting={false} />);
 
     await user.click(screen.getByRole('button', { name: /Sign in/i }));
 
@@ -39,7 +40,7 @@ describe('LoginForm', () => {
   it('calls onSubmit with the entered values when the form is valid', async () => {
     const onSubmit = jest.fn();
     const user = userEvent.setup();
-    render(<LoginForm title="Sign in" onSubmit={onSubmit} isSubmitting={false} />);
+    renderWithIntl(<LoginForm title="Sign in" onSubmit={onSubmit} isSubmitting={false} />);
 
     await user.type(screen.getByLabelText(/Email/i), 'jane@example.com');
     await user.type(screen.getByLabelText(/Password/i, { selector: 'input' }), 'Abcdefg1!');
@@ -54,7 +55,7 @@ describe('LoginForm', () => {
   });
 
   it('shows the errorMessage prop when set', () => {
-    render(
+    renderWithIntl(
       <LoginForm
         title="Sign in"
         onSubmit={jest.fn()}
@@ -67,7 +68,7 @@ describe('LoginForm', () => {
   });
 
   it('shows a loading indicator on the submit button while isSubmitting is true', () => {
-    render(<LoginForm title="Sign in" onSubmit={jest.fn()} isSubmitting={true} />);
+    renderWithIntl(<LoginForm title="Sign in" onSubmit={jest.fn()} isSubmitting={true} />);
 
     expect(screen.getByRole('img', { name: /loading/i })).toBeInTheDocument();
   });

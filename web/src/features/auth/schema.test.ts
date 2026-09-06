@@ -1,6 +1,8 @@
-import { loginSchema } from './schema';
+import { createLoginSchema } from './schema';
 
-describe('loginSchema', () => {
+describe('createLoginSchema', () => {
+  const t = (key: string) => key;
+  const loginSchema = createLoginSchema(t);
   const validPassword = 'Abcdefg1!';
 
   it('accepts a valid email and password', () => {

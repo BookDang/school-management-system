@@ -1,0 +1,13 @@
+{
+  "RootShell": {
+    "brand": "Cổng Quản Trị",
+    "dashboardNav": "Bảng Điều Khiển"
+  },
+  "StaffLoginPage": {
+    "title": "Đăng nhập Cổng Quản Trị",
+    "genericError": "Đã có lỗi xảy ra"
+  },
+  "Dashboard": {
+    "title": "Bảng Điều Khiển Quản Trị"
+  }
+}

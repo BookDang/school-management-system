@@ -1,0 +1,18 @@
+{
+  "LoginForm": {
+    "emailLabel": "Email",
+    "passwordLabel": "Password",
+    "passwordHint": "8-20 characters, with upper & lower case, a number, and a special character",
+    "passwordHintAriaLabel": "Password hint",
+    "signIn": "Sign in"
+  },
+  "LoginValidation": {
+    "emailInvalid": "Enter a valid email",
+    "passwordMin": "Must be at least 8 characters",
+    "passwordMax": "Must be at most 20 characters",
+    "passwordUppercase": "Must contain at least 1 uppercase letter",
+    "passwordLowercase": "Must contain at least 1 lowercase letter",
+    "passwordNumber": "Must contain at least 1 number",
+    "passwordSpecial": "Must contain at least 1 special character"
+  }
+}
