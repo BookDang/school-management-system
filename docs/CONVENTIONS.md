@@ -190,11 +190,11 @@ primary key is `id`; foreign keys are `<singular_table>_id` (`student_id`).
 
 ### Git branches
 
-`<type>/<kebab-case-slug>` — `feature/student-enrollment`, `fix/nginx-timeout`,
+`<type>/<kebab-case-slug>` — `feat/student-enrollment`, `fix/nginx-timeout`,
 `chore/upgrade-nest`. Long-lived branches: `main`, `develop`.
 
 If the work has a ticket/issue number, put it right after the type:
-`<type>/<TICKET-ID>-<kebab-case-slug>` — e.g. `feature/SMS-42-student-enrollment`. When a branch
+`<type>/<TICKET-ID>-<kebab-case-slug>` — e.g. `feat/SMS-42-student-enrollment`. When a branch
 carries a ticket number, commit subjects use the ticket as the conventional-commit scope:
 `feat(42): add student enrollment form`. No ticket number → no scope, just
 `<type>: <description>` (e.g. `chore: upgrade nest`).

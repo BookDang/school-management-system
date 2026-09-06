@@ -71,6 +71,11 @@ Point e2e tests at the dockerized stack instead: `PLAYWRIGHT_BASE_URL=http://sms
 
 Run from inside `api/` (`cd api`), or `npm --prefix api run <script>` from root.
 
+Swagger/OpenAPI docs are served at `/docs` (`http://localhost:4000/docs` standalone, or
+`http://sms.site/api/docs` through the dockerized stack — nginx's `/api/` prefix strip turns
+`/docs` on the container into `/api/docs` for the browser). Raw spec at `/docs-json`. Configured in
+`main.ts` via `@nestjs/swagger`'s `DocumentBuilder`/`SwaggerModule`.
+
 | Command | What it does |
 |---|---|
 | `npm run start:dev` | Start in watch mode (`http://localhost:4000`). |
