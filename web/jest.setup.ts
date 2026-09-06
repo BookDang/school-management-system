@@ -15,3 +15,12 @@ Object.defineProperty(window, 'matchMedia', {
     dispatchEvent: () => false,
   }),
 });
+
+// antd's Tooltip/Trigger positioning (@rc-component/resize-observer) needs ResizeObserver -
+// jsdom doesn't implement it either.
+class MockResizeObserver {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+}
+window.ResizeObserver = MockResizeObserver;

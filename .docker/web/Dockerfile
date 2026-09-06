@@ -9,4 +9,7 @@ COPY web/ .
 
 EXPOSE 3000
 
-CMD ["npm", "run", "dev"]
+# dev:docker (webpack, not the default Turbopack) so WATCHPACK_POLLING actually works - Turbopack's
+# Rust file watcher doesn't honor it, and native fs events don't reliably cross the Windows/macOS
+# Docker Desktop bind-mount bridge. See docs/COMMANDS.md.
+CMD ["npm", "run", "dev:docker"]

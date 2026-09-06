@@ -4,5 +4,8 @@
 // instead of fighting that packaging issue, since icon rendering isn't behavior worth testing.
 const MailOutlined = () => null;
 const LockOutlined = () => null;
+// Renders a real element (unlike the others) since tests hover/focus it to trigger the password
+// hint tooltip.
+const InfoCircleOutlined = (props: Record<string, unknown>) => <span {...props} />;
 
-export { LockOutlined, MailOutlined };
+export { InfoCircleOutlined, LockOutlined, MailOutlined };
