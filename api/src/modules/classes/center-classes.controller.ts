@@ -33,6 +33,7 @@ export class CenterClassesController {
   @Post()
   @CheckPolicies((ability) => ability.can(Action.Create, Classes))
   create(@Body() dto: CreateCenterClassDto) {
+    console.log('Creating class with DTO:', dto);
     return this.centerClassesService.create(dto);
   }
 
