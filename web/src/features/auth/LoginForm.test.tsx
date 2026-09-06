@@ -3,14 +3,25 @@ import userEvent from '@testing-library/user-event';
 import LoginForm from './LoginForm';
 
 describe('LoginForm', () => {
-  it('renders the title, fields, and password hint', () => {
+  it('renders the title and fields', () => {
     render(
       <LoginForm title="Sign in to School Portal" onSubmit={jest.fn()} isSubmitting={false} />,
     );
 
     expect(screen.getByText('Sign in to School Portal')).toBeInTheDocument();
     expect(screen.getByLabelText(/Email/i)).toBeInTheDocument();
-    expect(screen.getByText(/8-20 characters/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/Password/i, { selector: 'input' })).toBeInTheDocument();
+  });
+
+  it('shows the password hint in a tooltip on hover', async () => {
+    const user = userEvent.setup();
+    render(<LoginForm title="Sign in" onSubmit={jest.fn()} isSubmitting={false} />);
+
+    expect(screen.queryByText(/8-20 characters/i)).not.toBeInTheDocument();
+
+    await user.hover(screen.getByLabelText(/password hint/i));
+
+    expect(await screen.findByText(/8-20 characters/i)).toBeInTheDocument();
   });
 
   it('shows validation errors and does not submit when the fields are invalid', async () => {
@@ -31,7 +42,7 @@ describe('LoginForm', () => {
     render(<LoginForm title="Sign in" onSubmit={onSubmit} isSubmitting={false} />);
 
     await user.type(screen.getByLabelText(/Email/i), 'jane@example.com');
-    await user.type(screen.getByLabelText(/Password/i), 'Abcdefg1!');
+    await user.type(screen.getByLabelText(/Password/i, { selector: 'input' }), 'Abcdefg1!');
     await user.click(screen.getByRole('button', { name: /Sign in/i }));
 
     await waitFor(() => {

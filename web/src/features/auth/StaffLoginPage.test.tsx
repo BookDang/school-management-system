@@ -28,7 +28,7 @@ describe('StaffLoginPage', () => {
     render(<StaffLoginPage />);
 
     await user.type(screen.getByLabelText(/Email/i), 'admin@example.com');
-    await user.type(screen.getByLabelText(/Password/i), 'Abcdefg1!');
+    await user.type(screen.getByLabelText(/Password/i, { selector: 'input' }), 'Abcdefg1!');
     await user.click(screen.getByRole('button', { name: /Sign in/i }));
 
     await waitFor(() => {
@@ -43,7 +43,7 @@ describe('StaffLoginPage', () => {
     render(<StaffLoginPage />);
 
     await user.type(screen.getByLabelText(/Email/i), 'admin@example.com');
-    await user.type(screen.getByLabelText(/Password/i), 'Abcdefg1!');
+    await user.type(screen.getByLabelText(/Password/i, { selector: 'input' }), 'Abcdefg1!');
     await user.click(screen.getByRole('button', { name: /Sign in/i }));
 
     expect(await screen.findByText('Invalid email or password')).toBeInTheDocument();

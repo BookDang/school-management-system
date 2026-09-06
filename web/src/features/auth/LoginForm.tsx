@@ -1,8 +1,8 @@
 'use client';
 
-import { LockOutlined, MailOutlined } from '@ant-design/icons';
+import { InfoCircleOutlined, LockOutlined, MailOutlined } from '@ant-design/icons';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Button, Form, Input } from 'antd';
+import { Button, Form, Input, Tooltip } from 'antd';
 import { Controller, useForm } from 'react-hook-form';
 import { type LoginInput, loginSchema, PASSWORD_HINT } from './schema';
 
@@ -55,9 +55,13 @@ const LoginForm = ({ title, onSubmit, isSubmitting, errorMessage }: LoginFormPro
           label={
             <span>
               Password{' '}
-              <span className="text-xs font-normal text-black/50 dark:text-white/50">
-                ({PASSWORD_HINT})
-              </span>
+              <Tooltip title={PASSWORD_HINT}>
+                <InfoCircleOutlined
+                  aria-label="Password hint"
+                  tabIndex={0}
+                  className="text-black/50 dark:text-white/50"
+                />
+              </Tooltip>
             </span>
           }
           htmlFor="password"
@@ -82,7 +86,7 @@ const LoginForm = ({ title, onSubmit, isSubmitting, errorMessage }: LoginFormPro
 
         <Form.Item className="mb-0">
           <Button type="primary" htmlType="submit" loading={isSubmitting} block>
-            Sign in
+            Sign in (hr-check)
           </Button>
         </Form.Item>
       </Form>

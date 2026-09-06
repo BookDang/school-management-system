@@ -63,6 +63,12 @@ services:
       NODE_ENV: ${NODE_ENV:-development}
       PORT: 3000
       NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-/api}
+      # Host file-change events (inotify) don't reliably reach a Linux container through Docker
+      # Desktop's bind-mount bridge on Windows/macOS - fall back to polling so Fast Refresh
+      # actually picks up edits instead of serving a stale build until the container restarts.
+      # Only takes effect because .docker/web/Dockerfile runs `next dev --webpack`
+      # (`dev:docker` script) - the default Turbopack dev server doesn't honor this var.
+      WATCHPACK_POLLING: 'true'
     expose:
       - "3000"
     volumes:
