@@ -1,0 +1,13 @@
+{
+  "RootShell": {
+    "brand": "Admin Portal",
+    "dashboardNav": "Dashboard"
+  },
+  "StaffLoginPage": {
+    "title": "Sign in to Admin Portal",
+    "genericError": "Something went wrong"
+  },
+  "Dashboard": {
+    "title": "Admin Dashboard"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "LoginForm": {
+    "emailLabel": "Email",
+    "passwordLabel": "Mật khẩu",
+    "passwordHint": "8-20 ký tự, gồm chữ hoa & chữ thường, một chữ số và một ký tự đặc biệt",
+    "passwordHintAriaLabel": "Gợi ý mật khẩu",
+    "signIn": "Đăng nhập"
+  },
+  "LoginValidation": {
+    "emailInvalid": "Vui lòng nhập email hợp lệ",
+    "passwordMin": "Phải có ít nhất 8 ký tự",
+    "passwordMax": "Không được quá 20 ký tự",
+    "passwordUppercase": "Phải có ít nhất 1 chữ hoa",
+    "passwordLowercase": "Phải có ít nhất 1 chữ thường",
+    "passwordNumber": "Phải có ít nhất 1 chữ số",
+    "passwordSpecial": "Phải có ít nhất 1 ký tự đặc biệt"
+  }
+}

@@ -3,8 +3,9 @@
 import { InfoCircleOutlined, LockOutlined, MailOutlined } from '@ant-design/icons';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button, Form, Input, Tooltip } from 'antd';
+import { useTranslations } from 'next-intl';
 import { Controller, useForm } from 'react-hook-form';
-import { type LoginInput, loginSchema, PASSWORD_HINT } from './schema';
+import { createLoginSchema, type LoginInput } from './schema';
 
 interface LoginFormProps {
   title: string;
@@ -14,12 +15,14 @@ interface LoginFormProps {
 }
 
 const LoginForm = ({ title, onSubmit, isSubmitting, errorMessage }: LoginFormProps) => {
+  const t = useTranslations();
+
   const {
     control,
     handleSubmit,
     formState: { errors },
   } = useForm<LoginInput>({
-    resolver: zodResolver(loginSchema),
+    resolver: zodResolver(createLoginSchema((key) => t(`Common.LoginValidation.${key}`))),
     defaultValues: { email: '', password: '' },
   });
 
@@ -31,7 +34,7 @@ const LoginForm = ({ title, onSubmit, isSubmitting, errorMessage }: LoginFormPro
           registers these fields with antd's own field store. */}
       <Form layout="vertical" onFinish={() => handleSubmit(onSubmit)()}>
         <Form.Item
-          label="Email"
+          label={t('Common.LoginForm.emailLabel')}
           htmlFor="email"
           validateStatus={errors.email ? 'error' : ''}
           help={errors.email?.message}
@@ -54,10 +57,10 @@ const LoginForm = ({ title, onSubmit, isSubmitting, errorMessage }: LoginFormPro
         <Form.Item
           label={
             <span>
-              Password{' '}
-              <Tooltip title={PASSWORD_HINT}>
+              {t('Common.LoginForm.passwordLabel')}{' '}
+              <Tooltip title={t('Common.LoginForm.passwordHint')}>
                 <InfoCircleOutlined
-                  aria-label="Password hint"
+                  aria-label={t('Common.LoginForm.passwordHintAriaLabel')}
                   tabIndex={0}
                   className="text-black/50 dark:text-white/50"
                 />
@@ -86,7 +89,7 @@ const LoginForm = ({ title, onSubmit, isSubmitting, errorMessage }: LoginFormPro
 
         <Form.Item className="mb-0">
           <Button type="primary" htmlType="submit" loading={isSubmitting} block>
-            Sign in (hr-check)
+            {t('Common.LoginForm.signIn')}
           </Button>
         </Form.Item>
       </Form>

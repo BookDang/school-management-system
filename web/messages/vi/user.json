@@ -1,0 +1,13 @@
+{
+  "RootShell": {
+    "brand": "Cổng Trường",
+    "dashboardNav": "Bảng Điều Khiển"
+  },
+  "LoginPage": {
+    "title": "Đăng nhập Cổng Trường",
+    "genericError": "Đã có lỗi xảy ra"
+  },
+  "Dashboard": {
+    "title": "Bảng Điều Khiển"
+  }
+}

@@ -1,11 +1,12 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { useRouter } from 'next/navigation';
+import { useRouter } from '@/i18n/navigation';
 import { setAccessToken } from '@/lib/apiClient';
+import { renderWithIntl } from '../../test-utils/renderWithIntl';
 import { useStaffLogin } from './mutations';
 import StaffLoginPage from './StaffLoginPage';
 
-jest.mock('next/navigation', () => ({ useRouter: jest.fn() }));
+jest.mock('@/i18n/navigation', () => ({ useRouter: jest.fn() }));
 jest.mock('./mutations', () => ({ useStaffLogin: jest.fn() }));
 jest.mock('@/lib/apiClient', () => ({ setAccessToken: jest.fn() }));
 
@@ -25,7 +26,7 @@ describe('StaffLoginPage', () => {
       user: { id: '1', email: 'admin@example.com', fullName: 'Admin', role: 'admin' },
     });
     const user = userEvent.setup();
-    render(<StaffLoginPage />);
+    renderWithIntl(<StaffLoginPage />);
 
     await user.type(screen.getByLabelText(/Email/i), 'admin@example.com');
     await user.type(screen.getByLabelText(/Password/i, { selector: 'input' }), 'Abcdefg1!');
@@ -40,7 +41,7 @@ describe('StaffLoginPage', () => {
   it('shows an error message on failure and does not redirect', async () => {
     mutateAsync.mockRejectedValue({ status: 401, message: 'Invalid email or password' });
     const user = userEvent.setup();
-    render(<StaffLoginPage />);
+    renderWithIntl(<StaffLoginPage />);
 
     await user.type(screen.getByLabelText(/Email/i), 'admin@example.com');
     await user.type(screen.getByLabelText(/Password/i, { selector: 'input' }), 'Abcdefg1!');

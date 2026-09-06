@@ -1,7 +1,8 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { useState } from 'react';
+import { useRouter } from '@/i18n/navigation';
 import type { ApiError } from '@/lib/apiClient';
 import { setAccessToken } from '@/lib/apiClient';
 import LoginForm from './LoginForm';
@@ -10,6 +11,7 @@ import type { LoginInput } from './schema';
 
 const StaffLoginPage = () => {
   const router = useRouter();
+  const t = useTranslations();
   const [errorMessage, setErrorMessage] = useState<string>();
   const { mutateAsync, isPending } = useStaffLogin();
 
@@ -20,13 +22,13 @@ const StaffLoginPage = () => {
       setAccessToken(result.accessToken);
       router.push('/admin/dashboard');
     } catch (error) {
-      setErrorMessage((error as ApiError).message ?? 'Something went wrong');
+      setErrorMessage((error as ApiError).message ?? t('Admin.StaffLoginPage.genericError'));
     }
   };
 
   return (
     <LoginForm
-      title="Sign in to Admin Portal"
+      title={t('Admin.StaffLoginPage.title')}
       onSubmit={handleSubmit}
       isSubmitting={isPending}
       errorMessage={errorMessage}
