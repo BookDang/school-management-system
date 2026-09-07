@@ -1,10 +1,19 @@
-import type { Role } from '../entities/role.enum';
+import { ApiProperty } from '@nestjs/swagger';
+import { Role } from '../entities/role.enum';
 import type { User } from '../entities/user.entity';
 
-export interface PublicUser {
+/** User fields safe to expose over the API — excludes the password hash and other internals. */
+export class PublicUser {
+  @ApiProperty({ format: 'uuid' })
   id: string;
+
+  @ApiProperty({ format: 'email' })
   email: string;
+
+  @ApiProperty()
   fullName: string;
+
+  @ApiProperty({ enum: Role })
   role: Role;
 }
 

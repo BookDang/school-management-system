@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { ApiProperty } from '@nestjs/swagger';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
 import type { CreateCenterClassDto } from './dto/create-center-class.dto';
@@ -7,13 +8,26 @@ import { CenterClassDetail } from './entities/center-class-detail.entity';
 import { ClassType } from './entities/class-type.enum';
 import { Classes } from './entities/classes.entity';
 
-export interface CenterClassView {
+export class CenterClassView {
+  @ApiProperty({ format: 'uuid' })
   id: string;
+
+  @ApiProperty()
   name: string;
+
+  @ApiProperty({ format: 'uuid' })
   teacherId: string;
+
+  @ApiProperty()
   capacity: number;
+
+  @ApiProperty()
   subject: string;
+
+  @ApiProperty()
   createdAt: Date;
+
+  @ApiProperty()
   updatedAt: Date;
 }
 
