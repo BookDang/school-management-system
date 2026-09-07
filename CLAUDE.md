@@ -51,8 +51,10 @@ Two apps, one repo: `web` (Next.js) and `api` (NestJS), backed by MySQL 8.4, fro
   test:e2e`/`npm run check` can never write leftover rows into your real dev database. Docker must
   be installed and runnable for this — same requirement as `docker compose`.
 - Root `package.json` runs `npm install` for `web/` and `api/` too (via its `postinstall` script)
-  and wires up Husky: `.husky/pre-push` runs `npm run check` before every `git push`, blocking the
-  push on failure.
+  and wires up Husky: `.husky/pre-push` runs `npm run check`, then `npm run sonar` for both `api`
+  and `web`, before every `git push`, blocking the push on failure. The Sonar steps need the local
+  `sonarqube` container (see `docker-compose.yml`) and `SONAR_TOKEN` in the root `.env` — see
+  [docs/COMMANDS.md](docs/COMMANDS.md).
 - Full command reference: [docs/COMMANDS.md](docs/COMMANDS.md).
 
 ## Conventions

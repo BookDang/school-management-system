@@ -1,1 +1,6 @@
-npm run check
+# SonarQube steps need the local `sonarqube` container (docker-compose.yml) reachable and a
+# valid SONAR_TOKEN in the root .env — `docker compose run` auto-starts/waits for it to become
+# healthy, so a cold container adds real latency (30-60s+) to the first push after a restart.
+npm run check &&
+  npm --prefix api run sonar &&
+  npm --prefix web run sonar
