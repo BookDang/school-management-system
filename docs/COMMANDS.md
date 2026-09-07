@@ -5,8 +5,11 @@
 Run `npm install` at the repo root after cloning (or after pulling changes to either app's
 `package.json`) — its `postinstall` script cascades into `npm install` for both `web/` and `api/`,
 so one command keeps all three in sync instead of installing each separately. It also runs
-Husky's `prepare` step, wiring up `.husky/pre-push` to run `npm run check` before every
-`git push` and block the push if it fails.
+Husky's `prepare` step, wiring up `.husky/pre-push` to run `npm run check`, then `npm run sonar`
+for both `api` and `web`, before every `git push` — blocking the push if any of them fail. The
+Sonar steps need the local `sonarqube` container reachable and `SONAR_TOKEN` set in the root
+`.env` (see the SonarQube section below); `docker compose run` auto-starts that container if it's
+not already up, so a cold start adds real latency (30-60s+) to the first push after a restart.
 
 | Command | What it does |
 |---|---|
