@@ -9,21 +9,37 @@ import {
   UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
+import {
+  ApiBearerAuth,
+  ApiCookieAuth,
+  ApiCreatedResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiTags,
+  ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
 import type { Request, Response } from 'express';
 import { REFRESH_COOKIE_NAME } from '@/constants/auth-cookies.constant';
 import { clearRefreshCookie, setRefreshCookie } from '@/helpers/refresh-cookie.helper';
 import { AuthService } from './auth.service';
 import { CurrentUser } from './decorators/current-user.decorator';
+import { AuthResponseDto } from './dto/auth-response.dto';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import type { AuthenticatedUser } from './strategies/jwt.strategy';
 
 /** Authentication for end users of the system (e.g. students). */
+@ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  @ApiOperation({
+    summary: 'Register a new end-user account',
+    description: 'Also sets the `refresh_token` httpOnly cookie.',
+  })
+  @ApiCreatedResponse({ type: AuthResponseDto })
   @Post('register')
   async register(@Body() dto: RegisterDto, @Res({ passthrough: true }) res: Response) {
     const { accessToken, refreshToken, user } = await this.authService.register(dto);
@@ -31,6 +47,12 @@ export class AuthController {
     return { accessToken, user };
   }
 
+  @ApiOperation({
+    summary: 'Log in as an end user',
+    description: 'Also sets the `refresh_token` httpOnly cookie.',
+  })
+  @ApiOkResponse({ type: AuthResponseDto })
+  @ApiUnauthorizedResponse({ description: 'Invalid email or password.' })
   @Post('login')
   @HttpCode(HttpStatus.OK)
   async login(@Body() dto: LoginDto, @Res({ passthrough: true }) res: Response) {
@@ -39,6 +61,13 @@ export class AuthController {
     return { accessToken, user };
   }
 
+  @ApiOperation({
+    summary: 'Rotate the refresh token',
+    description: 'Reads the `refresh_token` httpOnly cookie and issues a new token pair.',
+  })
+  @ApiCookieAuth('refresh_token')
+  @ApiOkResponse({ type: AuthResponseDto })
+  @ApiUnauthorizedResponse({ description: 'Missing or invalid refresh token.' })
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
   async refresh(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
@@ -52,6 +81,13 @@ export class AuthController {
     return { accessToken: result.accessToken, user: result.user };
   }
 
+  @ApiOperation({
+    summary: 'Log out',
+    description: 'Clears the refresh session and the `refresh_token` cookie.',
+  })
+  @ApiBearerAuth()
+  @ApiOkResponse({ description: 'Logged out successfully.' })
+  @ApiUnauthorizedResponse({ description: 'Missing or invalid access token.' })
   @Post('logout')
   @HttpCode(HttpStatus.OK)
   @UseGuards(JwtAuthGuard)

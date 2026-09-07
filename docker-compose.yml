@@ -107,8 +107,64 @@ services:
     networks:
       - sms_network
 
+  sonarqube:
+    image: sonarqube:community
+    container_name: sms_sonarqube
+    restart: unless-stopped
+    ports:
+      - "${SONARQUBE_PORT:-9000}:9000"
+    volumes:
+      - sonarqube_data:/opt/sonarqube/data
+      - sonarqube_extensions:/opt/sonarqube/extensions
+      - sonarqube_logs:/opt/sonarqube/logs
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:9000/api/system/status | grep -q '\"status\":\"UP\"'"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 60s
+    networks:
+      - sms_network
+
+  # One-off analysis jobs, not part of the always-on stack — run explicitly with
+  # `docker compose run --rm sonar-scanner` / `sonar-scanner-web` (or `npm run sonar` inside api/ or web/).
+  sonar-scanner:
+    image: sonarsource/sonar-scanner-cli:latest
+    container_name: sms_sonar_scanner
+    profiles: ["tools"]
+    depends_on:
+      sonarqube:
+        condition: service_healthy
+    environment:
+      SONAR_HOST_URL: http://sonarqube:9000
+      SONAR_TOKEN: ${SONAR_TOKEN:-}
+    working_dir: /usr/src
+    volumes:
+      - ./api:/usr/src
+    networks:
+      - sms_network
+
+  sonar-scanner-web:
+    image: sonarsource/sonar-scanner-cli:latest
+    container_name: sms_sonar_scanner_web
+    profiles: ["tools"]
+    depends_on:
+      sonarqube:
+        condition: service_healthy
+    environment:
+      SONAR_HOST_URL: http://sonarqube:9000
+      SONAR_TOKEN: ${SONAR_TOKEN:-}
+    working_dir: /usr/src
+    volumes:
+      - ./web:/usr/src
+    networks:
+      - sms_network
+
 volumes:
   db_data:
+  sonarqube_data:
+  sonarqube_extensions:
+  sonarqube_logs:
 
 networks:
   sms_network:

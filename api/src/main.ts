@@ -28,6 +28,17 @@ async function bootstrap() {
     .setDescription('API for managing students, staff, and classes')
     .setVersion('1.0')
     .addBearerAuth()
+    .addCookieAuth('refresh_token', {
+      type: 'apiKey',
+      in: 'cookie',
+      description:
+        'End-user refresh token, set as an httpOnly cookie by /auth/login and /auth/register.',
+    })
+    .addCookieAuth('staff_refresh_token', {
+      type: 'apiKey',
+      in: 'cookie',
+      description: 'Staff refresh token, set as an httpOnly cookie by /auth/staff/login.',
+    })
     .build();
   const swaggerDocument = SwaggerModule.createDocument(app, swaggerConfig);
   SwaggerModule.setup('docs', app, swaggerDocument);

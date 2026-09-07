@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { ApiProperty } from '@nestjs/swagger';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
 import type { CreateTraditionalClassDto } from './dto/create-traditional-class.dto';
@@ -7,13 +8,26 @@ import { ClassType } from './entities/class-type.enum';
 import { Classes } from './entities/classes.entity';
 import { TraditionalClassDetail } from './entities/traditional-class-detail.entity';
 
-export interface TraditionalClassView {
+export class TraditionalClassView {
+  @ApiProperty({ format: 'uuid' })
   id: string;
+
+  @ApiProperty()
   name: string;
+
+  @ApiProperty({ format: 'uuid' })
   teacherId: string;
+
+  @ApiProperty()
   capacity: number;
+
+  @ApiProperty()
   gradeLevel: string;
+
+  @ApiProperty()
   createdAt: Date;
+
+  @ApiProperty()
   updatedAt: Date;
 }
 

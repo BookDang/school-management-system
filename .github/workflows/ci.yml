@@ -19,6 +19,13 @@ jobs:
       JWT_EXPIRES_IN: 15m
       JWT_REFRESH_SECRET: ci-refresh-secret
       JWT_REFRESH_EXPIRES_IN: 7d
+    services:
+      # Ephemeral instance for this run only — no history/dashboard persists between
+      # CI runs, unlike the docker-compose `sonarqube` service used for local analysis.
+      sonarqube:
+        image: sonarqube:community
+        ports:
+          - 9000:9000
     steps:
       - uses: actions/checkout@v4
 
@@ -36,6 +43,32 @@ jobs:
 
       - run: npm run test:e2e
 
+      - name: Wait for SonarQube
+        run: |
+          for i in $(seq 1 30); do
+            if curl -sf http://localhost:9000/api/system/status | grep -q '"status":"UP"'; then
+              exit 0
+            fi
+            sleep 5
+          done
+          echo "SonarQube did not become ready in time" >&2
+          exit 1
+
+      - name: Generate SonarQube token
+        id: sonar_token
+        run: |
+          TOKEN=$(curl -sf -u admin:admin -X POST "http://localhost:9000/api/user_tokens/generate" -d "name=ci-${{ github.run_id }}" | jq -r .token)
+          echo "::add-mask::$TOKEN"
+          echo "token=$TOKEN" >> "$GITHUB_OUTPUT"
+
+      - name: SonarQube Scan
+        uses: sonarsource/sonarqube-scan-action@v4
+        with:
+          projectBaseDir: api
+        env:
+          SONAR_HOST_URL: http://localhost:9000
+          SONAR_TOKEN: ${{ steps.sonar_token.outputs.token }}
+
       - run: npm run build
 
   web:
@@ -46,6 +79,13 @@ jobs:
         working-directory: web
     env:
       CI: true
+    services:
+      # Ephemeral instance for this run only — no history/dashboard persists between
+      # CI runs, unlike the docker-compose `sonarqube` service used for local analysis.
+      sonarqube:
+        image: sonarqube:community
+        ports:
+          - 9000:9000
     steps:
       - uses: actions/checkout@v4
 
@@ -60,6 +100,32 @@ jobs:
       - run: npm run lint
 
       - run: npm run test:cov
+
+      - name: Wait for SonarQube
+        run: |
+          for i in $(seq 1 30); do
+            if curl -sf http://localhost:9000/api/system/status | grep -q '"status":"UP"'; then
+              exit 0
+            fi
+            sleep 5
+          done
+          echo "SonarQube did not become ready in time" >&2
+          exit 1
+
+      - name: Generate SonarQube token
+        id: sonar_token
+        run: |
+          TOKEN=$(curl -sf -u admin:admin -X POST "http://localhost:9000/api/user_tokens/generate" -d "name=ci-${{ github.run_id }}" | jq -r .token)
+          echo "::add-mask::$TOKEN"
+          echo "token=$TOKEN" >> "$GITHUB_OUTPUT"
+
+      - name: SonarQube Scan
+        uses: sonarsource/sonarqube-scan-action@v4
+        with:
+          projectBaseDir: web
+        env:
+          SONAR_HOST_URL: http://localhost:9000
+          SONAR_TOKEN: ${{ steps.sonar_token.outputs.token }}
 
       - run: npm run build
 

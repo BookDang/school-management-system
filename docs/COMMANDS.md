@@ -23,6 +23,45 @@ Husky's `prepare` step, wiring up `.husky/pre-push` to run `npm run check` befor
 | `docker compose exec <service> sh` | Shell into a running container. |
 | `docker compose up -d --build --renew-anon-volumes <service>` | Rebuild one service and force-refresh its anonymous `node_modules` volume — see "Adding an npm dependency" below for when this is needed. |
 
+## SonarQube (`api/` and `web/`)
+
+### Local (persistent instance, manual)
+
+`./docker.sh up` / `docker compose up` also starts a `sonarqube` service (SonarQube Community
+Edition) on the same `sms_network`, at `http://localhost:9000` (override the host port with
+`SONARQUBE_PORT`). It's a JVM app with its own bundled database — noticeably heavier than the
+other services, and takes ~30-60s to report healthy on first boot. Data persists across restarts
+(named volumes), so this is the one to use for tracking quality trends over time.
+
+One-time setup:
+1. Bring the stack up, then open `http://localhost:9000` (default login `admin` / `admin`, you'll
+   be forced to change it).
+2. Generate a token (**My Account → Security → Generate Token**) — the project itself
+   (`school-management-system-api` / `school-management-system-web`, matching each app's
+   `sonar-project.properties`) is auto-created on first analysis, no need to create it by hand.
+3. Put that token in your root `.env` as `SONAR_TOKEN=...` (see `.env.example`).
+
+Then, from `api/` or `web/`:
+
+| Command | What it does |
+|---|---|
+| `npm run sonar` | Runs `test:cov` to refresh `coverage/lcov.info`, then runs the analysis via the `sonar-scanner`/`sonar-scanner-web` service (`sonarsource/sonar-scanner-cli`) against the running `sonarqube` service. Results show up on the project's dashboard at `http://localhost:9000`. |
+
+`sonar-scanner`/`sonar-scanner-web` are one-off jobs (Compose `profiles: ["tools"]`), not part of
+the always-on stack — they only run when explicitly invoked (`npm run sonar`, or
+`docker compose run --rm sonar-scanner` / `sonar-scanner-web`), not on every `docker compose up`.
+Analysis config lives in each app's `sonar-project.properties` (source/test globs, exclusions
+mirroring that app's `collectCoverageFrom`, and the path to the lcov report Jest already produces).
+
+### CI (GitHub Actions, on every push/PR)
+
+`ci.yml`'s `api` and `web` jobs each spin up their own **ephemeral** `sonarqube:community` service
+container for that run, wait for it to report healthy, generate a fresh admin token against it,
+then run `sonarsource/sonarqube-scan-action` after `test:cov`. This needs no externally-hosted
+server or repo secret — but each run's SonarQube instance is thrown away afterward, so **there is
+no dashboard or quality-trend history in CI**, only that run's pass/fail and log output. Use the
+local persistent instance above if you want to browse results or track trends over time.
+
 ## Adding an npm dependency (`web/` or `api/`)
 
 Both apps' Dockerfiles (`.docker/web/Dockerfile`, `.docker/api/Dockerfile`) do `COPY package*.json ./`

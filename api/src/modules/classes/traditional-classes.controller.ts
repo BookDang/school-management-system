@@ -10,6 +10,15 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
+import {
+  ApiBearerAuth,
+  ApiForbiddenResponse,
+  ApiNotFoundResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiTags,
+  ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
 import { CurrentUser } from '@/modules/auth/decorators/current-user.decorator';
 import { JwtAuthGuard } from '@/modules/auth/guards/jwt-auth.guard';
 import type { AuthenticatedUser } from '@/modules/auth/strategies/jwt.strategy';
@@ -20,8 +29,11 @@ import { PoliciesGuard } from '@/modules/authorization/policies.guard';
 import { CreateTraditionalClassDto } from './dto/create-traditional-class.dto';
 import { UpdateTraditionalClassDto } from './dto/update-traditional-class.dto';
 import { Classes } from './entities/classes.entity';
-import { TraditionalClassesService } from './traditional-classes.service';
+import { TraditionalClassesService, TraditionalClassView } from './traditional-classes.service';
 
+@ApiTags('Traditional Classes')
+@ApiBearerAuth()
+@ApiUnauthorizedResponse({ description: 'Missing or invalid access token.' })
 @Controller('traditional-classes')
 @UseGuards(JwtAuthGuard, PoliciesGuard)
 export class TraditionalClassesController {
@@ -30,18 +42,28 @@ export class TraditionalClassesController {
     private readonly caslAbilityFactory: CaslAbilityFactory,
   ) {}
 
+  @ApiOperation({ summary: 'Create a traditional (school) class' })
+  @ApiOkResponse({ type: TraditionalClassView })
+  @ApiForbiddenResponse({ description: 'Caller lacks permission to create classes.' })
   @Post()
   @CheckPolicies((ability) => ability.can(Action.Create, Classes))
   create(@Body() dto: CreateTraditionalClassDto) {
     return this.traditionalClassesService.create(dto);
   }
 
+  @ApiOperation({ summary: 'List all traditional classes' })
+  @ApiOkResponse({ type: TraditionalClassView, isArray: true })
+  @ApiForbiddenResponse({ description: 'Caller lacks permission to read classes.' })
   @Get()
   @CheckPolicies((ability) => ability.can(Action.Read, Classes))
   findAll() {
     return this.traditionalClassesService.findAll();
   }
 
+  @ApiOperation({ summary: 'Get a traditional class by id' })
+  @ApiOkResponse({ type: TraditionalClassView })
+  @ApiForbiddenResponse({ description: 'Caller lacks permission to read classes.' })
+  @ApiNotFoundResponse({ description: 'Class not found.' })
   @Get(':id')
   @CheckPolicies((ability) => ability.can(Action.Read, Classes))
   async findOne(@Param('id') id: string) {
@@ -60,6 +82,10 @@ export class TraditionalClassesController {
   // resolves a checked instance by its constructor reference, the same reference
   // `can(Action.Update, Classes, {...})` registered the rule under - `subject()` would tag the
   // object with a *string* instead, which doesn't match that reference.
+  @ApiOperation({ summary: 'Update a traditional class' })
+  @ApiOkResponse({ type: TraditionalClassView })
+  @ApiForbiddenResponse({ description: 'Caller cannot update this class.' })
+  @ApiNotFoundResponse({ description: 'Class not found.' })
   @Patch(':id')
   @CheckPolicies((ability) => ability.can(Action.Update, Classes))
   async update(
@@ -80,6 +106,10 @@ export class TraditionalClassesController {
     return this.traditionalClassesService.update(id, dto);
   }
 
+  @ApiOperation({ summary: 'Delete a traditional class' })
+  @ApiOkResponse({ description: 'Class deleted successfully.' })
+  @ApiForbiddenResponse({ description: 'Caller lacks permission to delete classes.' })
+  @ApiNotFoundResponse({ description: 'Class not found.' })
   @Delete(':id')
   @CheckPolicies((ability) => ability.can(Action.Delete, Classes))
   async remove(@Param('id') id: string) {
