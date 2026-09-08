@@ -237,4 +237,101 @@ describe('Classes (e2e)', () => {
         .expect(404);
     });
   });
+
+  describe('/classes/:classId/schedules', () => {
+    const scheduleDto = {
+      startDate: '2026-09-01',
+      endDate: '2026-12-15',
+      daysOfWeek: ['monday', 'wednesday'],
+      startTime: '18:00',
+      endTime: '20:00',
+    };
+
+    const createCenterClass = async (token: string, teacherId: string) => {
+      const res = await request(app.getHttpServer())
+        .post('/center-classes')
+        .set('Authorization', `Bearer ${token}`)
+        .send({ name: 'IELTS Foundation', teacherId, capacity: 15, subject: 'English' })
+        .expect(201);
+      return res.body.id as string;
+    };
+
+    it('rejects unauthenticated access', async () => {
+      const adminToken = await loginStaffAs(adminEmail);
+      const teacherId = (await usersService.findByEmail(teacherEmail))?.id as string;
+      const classId = await createCenterClass(adminToken, teacherId);
+
+      await request(app.getHttpServer()).get(`/classes/${classId}/schedules`).expect(401);
+    });
+
+    it('returns 404 for a non-existent class', async () => {
+      const adminToken = await loginStaffAs(adminEmail);
+
+      await request(app.getHttpServer())
+        .get('/classes/00000000-0000-0000-0000-000000000000/schedules')
+        .set('Authorization', `Bearer ${adminToken}`)
+        .expect(404);
+    });
+
+    it("lets a teacher add and read schedules on their own class but not another teacher's", async () => {
+      const adminToken = await loginStaffAs(adminEmail);
+      const teacherId = (await usersService.findByEmail(teacherEmail))?.id as string;
+      const classId = await createCenterClass(adminToken, teacherId);
+
+      const teacherToken = await loginStaffAs(teacherEmail);
+      const createRes = await request(app.getHttpServer())
+        .post(`/classes/${classId}/schedules`)
+        .set('Authorization', `Bearer ${teacherToken}`)
+        .send(scheduleDto)
+        .expect(201);
+
+      expect(createRes.body).toEqual(expect.objectContaining({ classId, ...scheduleDto }));
+
+      const listRes = await request(app.getHttpServer())
+        .get(`/classes/${classId}/schedules`)
+        .set('Authorization', `Bearer ${teacherToken}`)
+        .expect(200);
+      expect(listRes.body).toHaveLength(1);
+
+      const otherTeacherToken = await loginStaffAs(otherTeacherEmail);
+      await request(app.getHttpServer())
+        .post(`/classes/${classId}/schedules`)
+        .set('Authorization', `Bearer ${otherTeacherToken}`)
+        .send(scheduleDto)
+        .expect(403);
+    });
+
+    it('lets a teacher update and delete a schedule on their own class', async () => {
+      const adminToken = await loginStaffAs(adminEmail);
+      const teacherId = (await usersService.findByEmail(teacherEmail))?.id as string;
+      const classId = await createCenterClass(adminToken, teacherId);
+
+      const teacherToken = await loginStaffAs(teacherEmail);
+      const createRes = await request(app.getHttpServer())
+        .post(`/classes/${classId}/schedules`)
+        .set('Authorization', `Bearer ${teacherToken}`)
+        .send(scheduleDto)
+        .expect(201);
+      const scheduleId = createRes.body.id as string;
+
+      await request(app.getHttpServer())
+        .patch(`/classes/${classId}/schedules/${scheduleId}`)
+        .set('Authorization', `Bearer ${teacherToken}`)
+        .send({ startTime: '19:00' })
+        .expect(200)
+        .expect((res) => {
+          expect(res.body.startTime).toBe('19:00');
+        });
+
+      await request(app.getHttpServer())
+        .delete(`/classes/${classId}/schedules/${scheduleId}`)
+        .set('Authorization', `Bearer ${teacherToken}`)
+        .expect(200);
+
+      await request(app.getHttpServer())
+        .get(`/classes/${classId}/schedules/${scheduleId}`)
+        .set('Authorization', `Bearer ${teacherToken}`)
+        .expect(404);
+    });
+  });
 });
