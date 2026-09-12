@@ -2,8 +2,7 @@
   "LoginForm": {
     "emailLabel": "Email",
     "passwordLabel": "Password",
-    "passwordHint": "8-20 characters, with upper & lower case, a number, and a special character",
-    "passwordHintAriaLabel": "Password hint",
+    "passwordHintAriaLabel": "Password requirements",
     "signIn": "Sign in"
   },
   "LoginValidation": {

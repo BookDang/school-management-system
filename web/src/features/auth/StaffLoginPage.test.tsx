@@ -1,14 +1,14 @@
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useRouter } from '@/i18n/navigation';
-import { setAccessToken } from '@/lib/apiClient';
+import { staffApiClient } from '@/lib/apiClient';
 import { renderWithIntl } from '../../test-utils/renderWithIntl';
 import { useStaffLogin } from './mutations';
 import StaffLoginPage from './StaffLoginPage';
 
 jest.mock('@/i18n/navigation', () => ({ useRouter: jest.fn() }));
 jest.mock('./mutations', () => ({ useStaffLogin: jest.fn() }));
-jest.mock('@/lib/apiClient', () => ({ setAccessToken: jest.fn() }));
+jest.mock('@/lib/apiClient', () => ({ staffApiClient: { setAccessToken: jest.fn() } }));
 
 describe('StaffLoginPage', () => {
   const push = jest.fn();
@@ -33,7 +33,7 @@ describe('StaffLoginPage', () => {
     await user.click(screen.getByRole('button', { name: /Sign in/i }));
 
     await waitFor(() => {
-      expect(setAccessToken).toHaveBeenCalledWith('token-456');
+      expect(staffApiClient.setAccessToken).toHaveBeenCalledWith('token-456');
       expect(push).toHaveBeenCalledWith('/admin/dashboard');
     });
   });

@@ -18,6 +18,7 @@ const geistMono = Geist_Mono({
 
 interface RootShellProps {
   locale: string;
+  portal: 'user' | 'staff';
   brand: string;
   navHref: string;
   navLabel: string;
@@ -34,6 +35,7 @@ interface RootShellProps {
  */
 export const RootShell = async ({
   locale,
+  portal,
   brand,
   navHref,
   navLabel,
@@ -51,7 +53,7 @@ export const RootShell = async ({
       <body className="min-h-full flex flex-col">
         <AntdRegistry>
           <NextIntlClientProvider locale={locale} messages={messages}>
-            <Providers>
+            <Providers portal={portal}>
               <div className="flex min-h-full flex-1 flex-col">
                 <header
                   className={`flex items-center justify-between px-6 py-4 ${headerClassName}`}

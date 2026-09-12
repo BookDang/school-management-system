@@ -25,6 +25,7 @@ const UserLayout = async ({ children, params }: LayoutProps) => {
   return (
     <RootShell
       locale={locale}
+      portal="user"
       brand={t('User.RootShell.brand')}
       navHref="/dashboard"
       navLabel={t('User.RootShell.dashboardNav')}

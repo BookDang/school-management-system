@@ -4,7 +4,7 @@ import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { useRouter } from '@/i18n/navigation';
 import type { ApiError } from '@/lib/apiClient';
-import { setAccessToken } from '@/lib/apiClient';
+import { userApiClient } from '@/lib/apiClient';
 import LoginForm from './LoginForm';
 import { useLogin } from './mutations';
 import type { LoginInput } from './schema';
@@ -19,7 +19,7 @@ const LoginPage = () => {
     setErrorMessage(undefined);
     try {
       const result = await mutateAsync(values);
-      setAccessToken(result.accessToken);
+      userApiClient.setAccessToken(result.accessToken);
       router.push('/dashboard');
     } catch (error) {
       setErrorMessage((error as ApiError).message ?? t('User.LoginPage.genericError'));
