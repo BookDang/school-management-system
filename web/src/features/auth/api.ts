@@ -1,4 +1,4 @@
-import apiClient from '@/lib/apiClient';
+import { staffApiClient, userApiClient } from '@/lib/apiClient';
 import type { LoginInput } from './schema';
 
 export interface AuthUser {
@@ -14,11 +14,11 @@ export interface LoginResult {
 }
 
 export const login = async (input: LoginInput): Promise<LoginResult> => {
-  const response = await apiClient.post<LoginResult>('/auth/login', input);
+  const response = await userApiClient.post<LoginResult>('/auth/login', input);
   return response.data;
 };
 
 export const loginStaff = async (input: LoginInput): Promise<LoginResult> => {
-  const response = await apiClient.post<LoginResult>('/auth/staff/login', input);
+  const response = await staffApiClient.post<LoginResult>('/auth/staff/login', input);
   return response.data;
 };

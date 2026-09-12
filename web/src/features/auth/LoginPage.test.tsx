@@ -1,14 +1,14 @@
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useRouter } from '@/i18n/navigation';
-import { setAccessToken } from '@/lib/apiClient';
+import { userApiClient } from '@/lib/apiClient';
 import { renderWithIntl } from '../../test-utils/renderWithIntl';
 import LoginPage from './LoginPage';
 import { useLogin } from './mutations';
 
 jest.mock('@/i18n/navigation', () => ({ useRouter: jest.fn() }));
 jest.mock('./mutations', () => ({ useLogin: jest.fn() }));
-jest.mock('@/lib/apiClient', () => ({ setAccessToken: jest.fn() }));
+jest.mock('@/lib/apiClient', () => ({ userApiClient: { setAccessToken: jest.fn() } }));
 
 describe('LoginPage', () => {
   const push = jest.fn();
@@ -33,7 +33,7 @@ describe('LoginPage', () => {
     await user.click(screen.getByRole('button', { name: /Sign in/i }));
 
     await waitFor(() => {
-      expect(setAccessToken).toHaveBeenCalledWith('token-123');
+      expect(userApiClient.setAccessToken).toHaveBeenCalledWith('token-123');
       expect(push).toHaveBeenCalledWith('/dashboard');
     });
   });

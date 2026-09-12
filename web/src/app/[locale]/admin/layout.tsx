@@ -25,6 +25,7 @@ const AdminLayout = async ({ children, params }: LayoutProps) => {
   return (
     <RootShell
       locale={locale}
+      portal="staff"
       brand={t('Admin.RootShell.brand')}
       navHref="/admin/dashboard"
       navLabel={t('Admin.RootShell.dashboardNav')}

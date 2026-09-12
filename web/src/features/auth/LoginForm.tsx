@@ -58,7 +58,18 @@ const LoginForm = ({ title, onSubmit, isSubmitting, errorMessage }: LoginFormPro
           label={
             <span>
               {t('Common.LoginForm.passwordLabel')}{' '}
-              <Tooltip title={t('Common.LoginForm.passwordHint')}>
+              <Tooltip
+                title={
+                  <ul className="list-disc pl-4">
+                    <li>{t('Common.LoginValidation.passwordMin')}</li>
+                    <li>{t('Common.LoginValidation.passwordMax')}</li>
+                    <li>{t('Common.LoginValidation.passwordUppercase')}</li>
+                    <li>{t('Common.LoginValidation.passwordLowercase')}</li>
+                    <li>{t('Common.LoginValidation.passwordNumber')}</li>
+                    <li>{t('Common.LoginValidation.passwordSpecial')}</li>
+                  </ul>
+                }
+              >
                 <InfoCircleOutlined
                   aria-label={t('Common.LoginForm.passwordHintAriaLabel')}
                   tabIndex={0}

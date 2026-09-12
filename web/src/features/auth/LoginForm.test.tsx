@@ -14,15 +14,20 @@ describe('LoginForm', () => {
     expect(screen.getByLabelText(/Password/i, { selector: 'input' })).toBeInTheDocument();
   });
 
-  it('shows the password hint in a tooltip on hover', async () => {
+  it('shows the password requirements as a list in a tooltip on hover', async () => {
     const user = userEvent.setup();
     renderWithIntl(<LoginForm title="Sign in" onSubmit={jest.fn()} isSubmitting={false} />);
 
-    expect(screen.queryByText(/8-20 characters/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Must be at least 8 characters/i)).not.toBeInTheDocument();
 
-    await user.hover(screen.getByLabelText(/password hint/i));
+    await user.hover(screen.getByLabelText(/password requirements/i));
 
-    expect(await screen.findByText(/8-20 characters/i)).toBeInTheDocument();
+    expect(await screen.findByText(/Must be at least 8 characters/i)).toBeInTheDocument();
+    expect(screen.getByText(/Must be at most 20 characters/i)).toBeInTheDocument();
+    expect(screen.getByText(/Must contain at least 1 uppercase letter/i)).toBeInTheDocument();
+    expect(screen.getByText(/Must contain at least 1 lowercase letter/i)).toBeInTheDocument();
+    expect(screen.getByText(/Must contain at least 1 number/i)).toBeInTheDocument();
+    expect(screen.getByText(/Must contain at least 1 special character/i)).toBeInTheDocument();
   });
 
   it('shows validation errors and does not submit when the fields are invalid', async () => {

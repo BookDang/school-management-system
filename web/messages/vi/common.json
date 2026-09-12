@@ -2,8 +2,7 @@
   "LoginForm": {
     "emailLabel": "Email",
     "passwordLabel": "Mật khẩu",
-    "passwordHint": "8-20 ký tự, gồm chữ hoa & chữ thường, một chữ số và một ký tự đặc biệt",
-    "passwordHintAriaLabel": "Gợi ý mật khẩu",
+    "passwordHintAriaLabel": "Yêu cầu mật khẩu",
     "signIn": "Đăng nhập"
   },
   "LoginValidation": {
