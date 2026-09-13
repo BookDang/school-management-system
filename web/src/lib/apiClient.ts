@@ -1,8 +1,19 @@
 import axios, { type AxiosError, type AxiosInstance, type AxiosRequestConfig } from 'axios';
 
-export interface ApiError {
+/**
+ * A real Error subclass (not a plain object) so it behaves correctly wherever a thrown/rejected
+ * error is expected to be an actual Error - including a React Query error re-thrown to the
+ * nearest error.tsx boundary via `throwOnError` (Next.js types that prop as `Error & { digest?
+ * }`), and native Promise rejection semantics generally (e.g. `console.error`, stack traces).
+ */
+export class ApiError extends Error {
   status: number;
-  message: string;
+
+  constructor(status: number, message: string) {
+    super(message);
+    this.name = 'ApiError';
+    this.status = status;
+  }
 }
 
 interface NestErrorBody {
@@ -39,7 +50,7 @@ const normalizeError = (error: AxiosError<NestErrorBody>): ApiError => {
   const status = error.response?.status ?? 0;
   const rawMessage = error.response?.data?.message;
   const message = Array.isArray(rawMessage) ? rawMessage.join(', ') : (rawMessage ?? error.message);
-  return { status, message };
+  return new ApiError(status, message);
 };
 
 export const createApiClient = ({

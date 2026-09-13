@@ -19,6 +19,7 @@ const config: Config = {
     '!src/app/**/layout.tsx',
     '!src/app/**/page.tsx',
     '!src/app/providers.tsx',
+    '!src/app/global-error.tsx',
     '!src/components/AntdThemeProvider/AntdThemeProvider.tsx',
     '!src/components/RootShell/RootShell.tsx',
     '!src/components/RootShell/SidebarLayout.tsx',

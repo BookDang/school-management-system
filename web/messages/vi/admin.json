@@ -10,5 +10,20 @@
   },
   "Dashboard": {
     "title": "Bảng Điều Khiển Quản Trị"
+  },
+  "NotFound": {
+    "title": "Không tìm thấy trang",
+    "description": "Trang bạn tìm không tồn tại hoặc đã bị chuyển.",
+    "backHome": "Về bảng điều khiển"
+  },
+  "Error": {
+    "title": "Đã có lỗi xảy ra",
+    "description": "Đã xảy ra lỗi không mong muốn. Vui lòng thử lại.",
+    "retry": "Thử lại",
+    "backHome": "Về bảng điều khiển"
+  },
+  "Forbidden": {
+    "title": "Không có quyền truy cập",
+    "description": "Bạn không có quyền truy cập trang này."
   }
 }

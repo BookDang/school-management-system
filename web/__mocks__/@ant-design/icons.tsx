@@ -7,6 +7,8 @@ const LockOutlined = () => null;
 const LogoutOutlined = () => null;
 const DashboardOutlined = () => null;
 const GlobalOutlined = () => null;
+const HomeOutlined = () => null;
+const WarningOutlined = () => null;
 // Renders a real element (unlike the others) since tests hover/focus it to trigger the password
 // hint tooltip.
 const InfoCircleOutlined = (props: Record<string, unknown>) => <span {...props} />;
@@ -14,8 +16,10 @@ const InfoCircleOutlined = (props: Record<string, unknown>) => <span {...props} 
 export {
   DashboardOutlined,
   GlobalOutlined,
+  HomeOutlined,
   InfoCircleOutlined,
   LockOutlined,
   LogoutOutlined,
   MailOutlined,
+  WarningOutlined,
 };

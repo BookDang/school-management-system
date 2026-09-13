@@ -10,5 +10,20 @@
   },
   "Dashboard": {
     "title": "Admin Dashboard"
+  },
+  "NotFound": {
+    "title": "Page not found",
+    "description": "The page you're looking for doesn't exist or has been moved.",
+    "backHome": "Back to dashboard"
+  },
+  "Error": {
+    "title": "Something went wrong",
+    "description": "An unexpected error occurred. Please try again.",
+    "retry": "Try again",
+    "backHome": "Back to dashboard"
+  },
+  "Forbidden": {
+    "title": "Access denied",
+    "description": "You don't have permission to access this page."
   }
 }
