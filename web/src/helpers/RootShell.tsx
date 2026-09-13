@@ -2,9 +2,9 @@ import { AntdRegistry } from '@ant-design/nextjs-registry';
 import { Geist, Geist_Mono } from 'next/font/google';
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
-import { Link } from '@/i18n/navigation';
 import '@/app/globals.css';
 import Providers from '@/app/providers';
+import PortalNav from './PortalNav';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -22,6 +22,7 @@ interface RootShellProps {
   brand: string;
   navHref: string;
   navLabel: string;
+  loginPath: string;
   headerClassName: string;
   navClassName: string;
   children: React.ReactNode;
@@ -39,6 +40,7 @@ export const RootShell = async ({
   brand,
   navHref,
   navLabel,
+  loginPath,
   headerClassName,
   navClassName,
   children,
@@ -59,9 +61,12 @@ export const RootShell = async ({
                   className={`flex items-center justify-between px-6 py-4 ${headerClassName}`}
                 >
                   <span className="font-semibold">{brand}</span>
-                  <nav className={`flex gap-4 text-sm ${navClassName}`}>
-                    <Link href={navHref}>{navLabel}</Link>
-                  </nav>
+                  <PortalNav
+                    href={navHref}
+                    label={navLabel}
+                    loginPath={loginPath}
+                    className={navClassName}
+                  />
                 </header>
                 <main className="flex-1">{children}</main>
               </div>
