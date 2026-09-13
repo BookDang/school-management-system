@@ -1,7 +1,8 @@
 {
   "RootShell": {
     "brand": "Admin Portal",
-    "dashboardNav": "Dashboard"
+    "dashboardNav": "Dashboard",
+    "logout": "Log out"
   },
   "StaffLoginPage": {
     "title": "Sign in to Admin Portal",

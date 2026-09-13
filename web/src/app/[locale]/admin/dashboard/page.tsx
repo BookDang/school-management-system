@@ -4,7 +4,7 @@ const AdminDashboardPage = async () => {
   const t = await getTranslations();
 
   return (
-    <div className="p-6">
+    <div className="admin-dashboard-page py-4 pt-2">
       <h1 className="text-xl font-semibold">{t('Admin.Dashboard.title')}</h1>
     </div>
   );

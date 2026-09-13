@@ -13,5 +13,8 @@
     "passwordLowercase": "Phải có ít nhất 1 chữ thường",
     "passwordNumber": "Phải có ít nhất 1 chữ số",
     "passwordSpecial": "Phải có ít nhất 1 ký tự đặc biệt"
+  },
+  "LanguageSwitcher": {
+    "label": "Ngôn ngữ"
   }
 }

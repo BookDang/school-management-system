@@ -129,7 +129,7 @@ shared `app/layout.tsx`, since Next.js only allows either one shared root layout
 route-group root layouts, never both at once.
 
 The two root layouts still share the same fonts/`Providers`/shell markup — that part is factored
-into `helpers/RootShell.tsx` (a component, not a Next.js file-convention file, so it can be
+into `components/RootShell.tsx` (a component, not a Next.js file-convention file, so it can be
 anywhere). Each `layout.tsx` stays a thin wrapper: it just supplies its own `metadata` and the
 props that differ (brand text, nav link, header colors) and renders `<RootShell>`. Add a new
 top-level root layout the same way — write its own `layout.tsx` calling `RootShell` with its own
@@ -147,12 +147,58 @@ Same idea as the api side, mapped to the web stack:
 | Folder | Contains | Depends on | Example |
 |---|---|---|---|
 | `constants/` | Static values used in ≥2 features. No functions. | Nothing | route paths, shared limits |
-| `utils/` | Pure, generic functions — no React/Next, no app types. Portable to any TS project. | Nothing app-specific | `formatDate.ts` |
-| `helpers/` | Cross-cutting functions/hooks/components that **do** know React/Next or this app's types, but aren't owned by one feature. | React/Next, this app's types | `RootShell.tsx` (shared root-layout skeleton), a `useDebounce` hook |
+| `utils/` | Pure, generic logic — no React/Next, no app types. Portable to any TS project. | Nothing app-specific | `formatDate.ts`, `slugify.ts` |
+| `hooks/` | Cross-cutting React hooks not owned by one feature. | React | `useDebounce.ts` |
+| `components/` | Cross-cutting UI components not owned by one feature. | React/Next, this app's types | `RootShell.tsx` (shared root-layout skeleton) |
 | `lib/` | Clients/SDK wrappers for external services — the web equivalent of api's `infrastructure/`. | External services | `apiClient.ts` (axios instance) |
 
-All four currently exist only as scaffolding except `lib/` (already holds `apiClient.ts`) — don't
-force something into `constants/`/`utils/`/`helpers/` before there's a real need for it.
+Each `components/` entry gets its own subfolder — `components/<Name>/<Name>.tsx` plus
+`<Name>.test.tsx` alongside it, with an `index.ts` barrel (`export { default } from './<Name>'` or
+`export { <Name> } from './<Name>'`) so external imports stay `@/components/<Name>` regardless of
+the internal layout. A closely-related group of components (e.g. a sidenav and the item/header
+pieces it alone uses) shares one group folder — `components/Sidenav/Sidenav.tsx`,
+`components/Sidenav/SidenavItem.tsx`, one `index.ts` for the group — rather than each piece getting
+its own top-level folder; a piece only gets pulled out into its own `components/<Name>/` once
+something outside that group actually reuses it.
+
+All of these except `lib/` (already holds `apiClient.ts`) and `components/` (already holds
+`RootShell.tsx`/`PortalNav.tsx`) currently exist only as scaffolding — don't force something into
+`constants/`/`utils/`/`hooks/` before there's a real need for it.
+
+#### Debug class name on every component's root element (BEM)
+
+Every component's root JSX output also carries a plain, kebab-case **block** class matching its
+own name — `AdminSidebar` → `className="admin-sidebar ..."`, listed first alongside the
+Tailwind/antd classes. It exists purely so a DOM node can be traced back to the component (and, via
+element/modifier, the specific part/state) that rendered it straight from the browser's Elements
+panel, since Tailwind's generated utility classes (`flex h-full flex-col`) carry no such
+information. Never write a CSS rule or `:global()` selector targeting one of these — they're an
+identifier, not a styling hook, and using one for styling would silently turn a rename of the
+component into a style regression. A component with no DOM node of its own (a pure context provider
+like `AntdThemeProvider`) or whose root is `<html>`/`<body>` (already unique — `RootShell`) is
+exempt.
+
+Named per [BEM](http://getbem.com/naming/):
+
+- **Block** — the component's own root, e.g. `admin-sidebar`.
+- **Element** (`block__element`) — a section inside the component worth identifying on its own,
+  e.g. `admin-sidebar__brand`, `admin-sidebar__menu`, `admin-sidebar__footer`. Only add one for a
+  structurally distinct, named part — not every wrapper `<div>`; a component with a single obvious
+  child (e.g. `PortalNav`'s one `<Link>`) doesn't need any elements.
+- **Modifier** (`block--modifier` / `block__element--modifier`) — a state/variant worth telling
+  apart in devtools, e.g. `admin-sidebar--collapsed`. Applied only while that state is active — the
+  default/resting state carries no modifier.
+
+A child that's a separate reusable component in its own right (e.g. `LanguageSwitcher` used inside
+`AdminSidebar`) gets its **own** block name, never treated as an element of its parent — it already
+has its own root class from this same rule.
+
+Applies to `src/app/**/page.tsx` too whenever one contains its own markup directly instead of just
+re-exporting a feature component (an exception to the "thin route file" rule above, e.g. a one-off
+page with no dedicated feature component yet) — e.g. `AdminDashboardPage` →
+`className="admin-dashboard-page ..."`. A `page.tsx` that only does
+`export { default } from '@/features/.../XPage'` needs no class of its own; the identifier belongs
+on `XPage`'s root instead.
 
 ## Naming conventions
 

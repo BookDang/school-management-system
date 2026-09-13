@@ -1,7 +1,8 @@
 {
   "RootShell": {
     "brand": "Cổng Quản Trị",
-    "dashboardNav": "Bảng Điều Khiển"
+    "dashboardNav": "Bảng Điều Khiển",
+    "logout": "Đăng xuất"
   },
   "StaffLoginPage": {
     "title": "Đăng nhập Cổng Quản Trị",

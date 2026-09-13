@@ -19,7 +19,7 @@ const PortalNav = ({ href, label, loginPath, className }: PortalNavProps) => {
   }
 
   return (
-    <nav className={`flex gap-4 text-sm ${className}`}>
+    <nav className={`portal-nav flex gap-4 text-sm ${className}`}>
       <Link href={href}>{label}</Link>
     </nav>
   );
