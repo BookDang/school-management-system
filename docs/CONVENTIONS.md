@@ -284,6 +284,13 @@ src/features/students/
   validation error, unhandled 500) to `{ status, message }` (the `ApiError` type exported from
   `apiClient.ts`). Hook consumers read `error.message`/`error.status` without checking whether the
   error came from axios or the server.
+- **500s and network failures from a `useQuery` need no per-page handling** — `providers.tsx`
+  configures `QueryClient` with `throwOnError: shouldThrowQueryError` (`utils/shouldThrowQueryError.ts`),
+  which re-throws a query error to the nearest `error.tsx` boundary when it represents a genuinely
+  broken backend (no response at all, or a 5xx). A 4xx (validation, expired session, forbidden, not
+  found) is left in the query's own `error` state for the component to handle inline, same as a
+  `useMutation` error always is (mutations are never thrown this way — a failed form submit should
+  show an inline message, like `LoginPage` does, not blow away the whole page).
 - **Forms** — validate input with the same zod schema used for the request body
   (`type CreateStudentInput = z.infer<typeof createStudentSchema>`), wired through
   `react-hook-form` via `@hookform/resolvers/zod` (install it when the first form is built — not a

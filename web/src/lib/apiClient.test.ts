@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { createApiClient, staffApiClient, userApiClient } from './apiClient';
+import { ApiError, createApiClient, staffApiClient, userApiClient } from './apiClient';
 
 type ResponseHandler = {
   fulfilled: (v: unknown) => unknown;
@@ -62,10 +62,11 @@ describe('apiClient response interceptor', () => {
       message: 'Request failed with status code 400',
     };
 
-    await expect(rejected(error)).rejects.toEqual({
+    await expect(rejected(error)).rejects.toMatchObject({
       status: 400,
       message: 'email must be an email, password is too short',
     });
+    await expect(rejected(error)).rejects.toBeInstanceOf(ApiError);
   });
 
   it('uses a string validation message as-is', async () => {
@@ -75,7 +76,7 @@ describe('apiClient response interceptor', () => {
       message: 'Request failed with status code 409',
     };
 
-    await expect(rejected(error)).rejects.toEqual({
+    await expect(rejected(error)).rejects.toMatchObject({
       status: 409,
       message: 'Email is already registered',
     });
@@ -85,7 +86,7 @@ describe('apiClient response interceptor', () => {
     const { rejected } = getResponseHandler(userApiClient);
     const error = { message: 'Network Error' };
 
-    await expect(rejected(error)).rejects.toEqual({
+    await expect(rejected(error)).rejects.toMatchObject({
       status: 0,
       message: 'Network Error',
     });
@@ -133,7 +134,10 @@ describe('apiClient 401 refresh-and-retry', () => {
       message: 'Request failed with status code 401',
     };
 
-    await expect(rejected(error)).rejects.toEqual({ status: 401, message: 'still unauthorized' });
+    await expect(rejected(error)).rejects.toMatchObject({
+      status: 401,
+      message: 'still unauthorized',
+    });
     expect(postSpy).not.toHaveBeenCalled();
   });
 
@@ -148,7 +152,7 @@ describe('apiClient 401 refresh-and-retry', () => {
       message: 'Request failed with status code 401',
     };
 
-    await expect(rejected(error)).rejects.toEqual({ status: 401, message: 'unauthorized' });
+    await expect(rejected(error)).rejects.toMatchObject({ status: 401, message: 'unauthorized' });
     expect(onSessionExpired).toHaveBeenCalledTimes(1);
   });
 
