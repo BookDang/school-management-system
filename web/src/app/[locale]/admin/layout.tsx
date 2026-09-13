@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
-import { RootShell } from '@/helpers/RootShell';
+import AdminSidebar from '@/components/AdminSidebar';
+import { RootShell } from '@/components/RootShell';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -20,19 +21,9 @@ export const generateMetadata = async ({
 
 const AdminLayout = async ({ children, params }: LayoutProps) => {
   const { locale } = await params;
-  const t = await getTranslations({ locale });
 
   return (
-    <RootShell
-      locale={locale}
-      portal="staff"
-      brand={t('Admin.RootShell.brand')}
-      navHref="/admin/dashboard"
-      navLabel={t('Admin.RootShell.dashboardNav')}
-      loginPath="/admin/login"
-      headerClassName="bg-zinc-900 text-zinc-50"
-      navClassName="text-zinc-300"
-    >
+    <RootShell locale={locale} portal="staff" layout="sidebar" sidebar={<AdminSidebar />}>
       {children}
     </RootShell>
   );

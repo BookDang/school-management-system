@@ -73,7 +73,7 @@ const LoginForm = ({ title, onSubmit, isSubmitting, errorMessage }: LoginFormPro
                 <InfoCircleOutlined
                   aria-label={t('Common.LoginForm.passwordHintAriaLabel')}
                   tabIndex={0}
-                  className="text-black/50 dark:text-white/50"
+                  className="text-neutral-500 dark:text-neutral-400"
                 />
               </Tooltip>
             </span>
@@ -96,7 +96,7 @@ const LoginForm = ({ title, onSubmit, isSubmitting, errorMessage }: LoginFormPro
           />
         </Form.Item>
 
-        {errorMessage && <p className="text-sm text-red-600">{errorMessage}</p>}
+        {errorMessage && <p className="text-sm text-error-600">{errorMessage}</p>}
 
         <Form.Item className="mb-0">
           <Button type="primary" htmlType="submit" loading={isSubmitting} block>

@@ -13,5 +13,8 @@
     "passwordLowercase": "Must contain at least 1 lowercase letter",
     "passwordNumber": "Must contain at least 1 number",
     "passwordSpecial": "Must contain at least 1 special character"
+  },
+  "LanguageSwitcher": {
+    "label": "Language"
   }
 }

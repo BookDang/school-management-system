@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
-import { RootShell } from '@/helpers/RootShell';
+import { RootShell } from '@/components/RootShell';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -26,12 +26,13 @@ const UserLayout = async ({ children, params }: LayoutProps) => {
     <RootShell
       locale={locale}
       portal="user"
+      layout="topnav"
       brand={t('User.RootShell.brand')}
       navHref="/dashboard"
       navLabel={t('User.RootShell.dashboardNav')}
       loginPath="/login"
-      headerClassName="border-b border-black/[.08] dark:border-white/[.145]"
-      navClassName="text-zinc-600 dark:text-zinc-400"
+      headerClassName="border-b border-neutral-200 dark:border-neutral-800"
+      navClassName="text-neutral-600 dark:text-neutral-400"
     >
       {children}
     </RootShell>
