@@ -29,6 +29,7 @@ const AdminLayout = async ({ children, params }: LayoutProps) => {
       brand={t('Admin.RootShell.brand')}
       navHref="/admin/dashboard"
       navLabel={t('Admin.RootShell.dashboardNav')}
+      loginPath="/admin/login"
       headerClassName="bg-zinc-900 text-zinc-50"
       navClassName="text-zinc-300"
     >

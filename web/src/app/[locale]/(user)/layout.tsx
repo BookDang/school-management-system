@@ -29,6 +29,7 @@ const UserLayout = async ({ children, params }: LayoutProps) => {
       brand={t('User.RootShell.brand')}
       navHref="/dashboard"
       navLabel={t('User.RootShell.dashboardNav')}
+      loginPath="/login"
       headerClassName="border-b border-black/[.08] dark:border-white/[.145]"
       navClassName="text-zinc-600 dark:text-zinc-400"
     >
